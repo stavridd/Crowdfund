@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 using Crowdfund.Core.Model.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Core.Services {
     public class BuyerService : IBuyerService 
@@ -14,31 +16,35 @@ namespace Crowdfund.Core.Services {
                 throw new ArgumentException(nameof(context));
         }
 
-        public Buyer CreateBuyer(
+        public async Task<ApiResult<Buyer>> CreateBuyerAsync(
             Model.Options.CreateBuyerOptions options)
         {
             if (options == null) {
-                return null;
+                return new ApiResult<Buyer>(
+                    StatusCode.BadRequest, "Null options");
             }
 
             if (string.IsNullOrWhiteSpace(options.FirstName) ||
               string.IsNullOrWhiteSpace(options.LastName)) {
-                return null;
+                return new ApiResult<Buyer>(
+                   StatusCode.BadRequest, "Null FirstName Or LastName");
             }
 
             if(options.Age == 0 ||
                     options.Age < 18) {
-                return null;
+                return new ApiResult<Buyer>(
+                   StatusCode.BadRequest, "Age is Invalid");
             }
 
-            var exists = SearchBuyer(
+            var exists = await SearchBuyer(
                 new SearchBuyerOptions()
                 {
                     Email = options.Email,            
-                }).SingleOrDefault();
+                }).SingleOrDefaultAsync();
 
             if (exists != null) {
-                return null;
+                return new ApiResult<Buyer>(
+                   StatusCode.InternalServerError, "Backer is already exist");
             }
 
             var buyer = new Buyer()
@@ -49,15 +55,15 @@ namespace Crowdfund.Core.Services {
                 Age = options.Age
             };
 
-            context_.Add(buyer);
+            await context_.AddAsync(buyer);
             try {
-                context_.SaveChanges();
+               await context_.SaveChangesAsync();
             } catch (Exception ex) {
                 
                 return null;
             }
 
-            return buyer;
+            return ApiResult<Buyer>.CreateSuccess(buyer);
         }
 
        public IQueryable<Buyer> SearchBuyer(
@@ -89,54 +95,64 @@ namespace Crowdfund.Core.Services {
             return query.Take(500);
         }
 
-        public Buyer SearchBuyerById(int buyerId)
+        public async Task<ApiResult<Buyer>> SearchBuyerByIdAsync(int buyerId)
         {
             if (buyerId <= 0) {
-                return null;
+                return new ApiResult<Buyer>(
+                    StatusCode.BadRequest, "Invalid Id");
             }
 
-            return context_
+            var buyer = await context_
                 .Set<Buyer>()
-                .SingleOrDefault(s => s.Id == buyerId);
+                .SingleOrDefaultAsync(s => s.Id == buyerId);
+
+            if (buyer == null ) {
+                return new ApiResult<Buyer>(
+                    StatusCode.NotFound, "Backer doesn't exist");
+            }
+
+            return ApiResult<Buyer>.CreateSuccess(buyer);
         }
 
-        public bool UpdateBuyer(int id, UpdateBuyerOptions options)
+        public async Task<ApiResult<Buyer>> UpdateBuyerAsync(int id, UpdateBuyerOptions options)
         {
             if (id <= 0) {
-                return false;
+                return new ApiResult<Buyer>(
+                    StatusCode.BadRequest, "Invalid Id");
             }
 
             if (options == null) {
-                return false;
+                return new ApiResult<Buyer>(
+                    StatusCode.BadRequest, "Invalid Options");
             }
 
-            var buyer = SearchBuyerById(id);
+            var buyer = await SearchBuyerByIdAsync(id);
 
             if(!string.IsNullOrWhiteSpace(options.FirstName)) 
             {
-                buyer.FirstName = options.FirstName;
+                buyer.Data.FirstName = options.FirstName;
             }
 
             if (!string.IsNullOrWhiteSpace(options.LastName)) {
-                buyer.LastName = options.LastName;
+                buyer.Data.LastName = options.LastName;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Photo)) {
-                buyer.Photo = options.Photo;
+                buyer.Data.Photo = options.Photo;
             }
 
             if (options.Age != 0) {
-                buyer.Age = options.Age;
+                buyer.Data.Age = options.Age;
             }
 
             //context_.Update(buyer);
             var success = false;
             try {
-                success = context_.SaveChanges() > 0;
+                success = await context_.SaveChangesAsync() > 0;
             } catch (Exception ex) {
 
             }
-            return success;
+            return ApiResult<Buyer>.CreateSuccess(buyer.Data);
         }
     }
 }

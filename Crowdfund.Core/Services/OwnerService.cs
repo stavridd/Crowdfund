@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 using Crowdfund.Core.Model.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Core.Services {
     public class OwnerService : IOwnerService 
@@ -14,31 +16,35 @@ namespace Crowdfund.Core.Services {
                 throw new ArgumentException(nameof(context));
         }
 
-        public Owner CreateOwner(
+        public async Task<ApiResult<Owner>> CreateOwnerAsync(
             Model.Options.CreateOwnerOptions options)
         {
             if (options == null) {
-                return null;
+                return new ApiResult<Owner>(
+                    StatusCode.BadRequest, "Null options");
             }
 
             if (string.IsNullOrWhiteSpace(options.FirstName) ||
               string.IsNullOrWhiteSpace(options.LastName)) {
-                return null;
+                return new ApiResult<Owner>(
+                   StatusCode.BadRequest, "Null FirstName Or LastName");
             }
 
             if (options.Age == 0 ||
                     options.Age < 18) {
-                return null;
+                return new ApiResult<Owner>(
+                    StatusCode.BadRequest, "Age is Invalid");
             }
 
-            var exists = SearchOwner(
+            var exists = await SearchOwner(
                 new SearchOwnerOptions()
                 {
                     Email = options.Email,            
-                }).SingleOrDefault();
+                }).SingleOrDefaultAsync();
 
             if (exists != null) {
-                return null;
+                return new ApiResult<Owner>(
+                   StatusCode.InternalServerError, "Project Creator is already exist");
             }
 
             var owner = new Owner()
@@ -49,15 +55,15 @@ namespace Crowdfund.Core.Services {
                 Age = options.Age
             };
 
-            context_.Add(owner);
+            await context_.AddAsync(owner);
             try {
-                context_.SaveChanges();
+                await context_.SaveChangesAsync();
             } catch (Exception ex) {
                 
                 return null;
             }
 
-            return owner;
+            return ApiResult<Owner>.CreateSuccess(owner);
         }
 
        public IQueryable<Owner> SearchOwner(
@@ -89,64 +95,73 @@ namespace Crowdfund.Core.Services {
             return query.Take(500);
         }
 
-        public Owner SearchOwnerById(int ownerId)
+        public async Task<ApiResult<Owner>> SearchOwnerByIdAsync(int ownerId)
         {
             if (ownerId <= 0) {
-                return null;
+                return new ApiResult<Owner>(
+                    StatusCode.BadRequest, "Invalid Id");
             }
 
-            return context_
+            var owner = await context_
                 .Set<Owner>()
-                .SingleOrDefault(s => s.Id == ownerId);
+                .SingleOrDefaultAsync(s => s.Id == ownerId);
+
+            if (owner == null) {
+                return new ApiResult<Owner>(
+                    StatusCode.NotFound, "Backer doesn't exist");
+            }
+            return ApiResult<Owner>.CreateSuccess(owner);
         }
 
-        public bool UpdateOwner(int id, UpdateOwnerOptions options)
+        public async Task<ApiResult<Owner>> UpdateOwnerAsync(int id, UpdateOwnerOptions options)
         {
             if (id <= 0) {
-                return false;
+                return new ApiResult<Owner>(
+                    StatusCode.BadRequest, "Invalid Id");
             }
 
             if (options == null) {
-                return false;
+                return new ApiResult<Owner>(
+                    StatusCode.BadRequest, "Invalid Options");
             }
 
-            var owner = SearchOwnerById(id);
+            var owner = await SearchOwnerByIdAsync(id);
 
             if(!string.IsNullOrWhiteSpace(options.FirstName)) 
             {
-                owner.FirstName = options.FirstName;
+                owner.Data.FirstName = options.FirstName;
             }
 
             if (!string.IsNullOrWhiteSpace(options.LastName)) {
-                owner.LastName = options.LastName;
+                owner.Data.LastName = options.LastName;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Photo)) {
-                owner.Photo = options.Photo;
+                owner.Data.Photo = options.Photo;
             }
 
             if (options.Age != 0) {
-                owner.Age = options.Age;
+                owner.Data.Age = options.Age;
             }
 
             //context_.Update(owner);
             var success = false;
             try {
-                success = context_.SaveChanges() > 0;
+                success = await context_.SaveChangesAsync() > 0;
             } catch (Exception ex) {
 
             }
-            return success;
+            return ApiResult<Owner>.CreateSuccess(owner.Data);
         }
 
-        public bool AddReward (int ownerId, Reward reward)
+        public async Task<bool> AddRewardAsync (int ownerId, Reward reward)
         {
             if (reward == null) {
                 return false;
             }
 
-            var owner = SearchOwnerById(ownerId);
-            owner.Rewards.Add(reward);
+            var owner = await SearchOwnerByIdAsync(ownerId);
+            owner.Data.Rewards.Add(reward);
             return true; 
         }
     }
