@@ -30,7 +30,7 @@ namespace Crowdfund.Core.Services {
                    StatusCode.BadRequest, "Null FirstName Or LastName");
             }
 
-            if(options.Age == 0 ||
+            if (options.Age == 0 ||
                     options.Age < 18) {
                 return new ApiResult<Buyer>(
                    StatusCode.BadRequest, "Age is Invalid");
@@ -145,7 +145,6 @@ namespace Crowdfund.Core.Services {
                 buyer.Data.Age = options.Age;
             }
 
-            //context_.Update(buyer);
             var success = false;
             try {
                 success = await context_.SaveChangesAsync() > 0;

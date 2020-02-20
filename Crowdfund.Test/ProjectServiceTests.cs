@@ -6,6 +6,7 @@ using Autofac;
 
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
+using System.Threading.Tasks;
 
 namespace Crowdfund.Test {
     public partial class ProjectServiceTests : IClassFixture<CrowdfundFixture>
@@ -19,7 +20,7 @@ namespace Crowdfund.Test {
 
 
         [Fact]
-        public void CreateProjectSuccess()
+        public async Task CreateProjectSuccessAsync()
         {
             var option = new CreateProjectOptions()
             {
@@ -35,7 +36,7 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void CreateProjectFail_SameTitle()
+        public async Task CreateProjectFail_SameTitleAsync()
         {
             var option = new CreateProjectOptions()
             {
@@ -44,7 +45,7 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project = psvc_.CreateProject(2, option);
+            var project = await psvc_.CreateProjectAsync(2, option);
 
             Assert.NotNull(project);
         }
@@ -61,14 +62,14 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project = psvc_.CreateProject(3, option);
+            var project =  await psvc_.CreateProjectAsync(3, option);
 
             var search = new SearchProjectOptions()
             {
                 Title = $"This is a Test Project {rand}",
             };
 
-            var pr = psvc_.SearchProject(search);
+            var pr = await psvc_.SearchProjectAsync(search);
 
             Assert.NotNull(pr);
             Assert.Contains($"This is a Test Project {rand}",
@@ -76,10 +77,10 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void SearchProjectByIdSuccess()
+        public async Task SearchProjectByIdSuccessAsync()
         {
             
-            var pr = psvc_.SearchProjectByCstegory(
+            var pr = await psvc_.SearchProjectByCstegoryAsync(
                  Core.Model.ProjectCategory.DesignAndTech);
 
             Assert.NotNull(pr);
@@ -87,15 +88,15 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void ChangeProjectStatusSuccess()
+        public async Task ChangeProjectStatusSuccessAsync()
         {
 
-            var pr = psvc_.ChangeProjectStatus(1,
+            var pr = await psvc_.ChangeProjectStatusAsync(1,
                 Core.Model.ProjectStatus.Completed);
             
             Assert.True(pr);
 
-            var result = psvc_.SearchProjectById(1);
+            var result = await psvc_.SearchProjectByIdAsync(1);
 
             var stat = result.Status.ToString();
 
@@ -103,13 +104,13 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void GetProjectIdSuccess()
+        public async Task GetProjectIdSuccessAsync()
         {
 
             var title = "This is a Test Project 29";
             var Desc = "This is the first test project";
 
-            var Id = psvc_.GetProjectId(title, Desc);
+            var Id = await psvc_.GetProjectIdAsync(title, Desc);
 
             Assert.Equal(4, Id);
 

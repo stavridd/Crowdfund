@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Crowdfund.Core.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Core.Services {
     public class RewardService : IRewardService 
@@ -20,24 +22,28 @@ namespace Crowdfund.Core.Services {
             //buyers_ = buyer;
         }
 
-       public Reward CreateReward(int ownerId,
+       public async Task<ApiResult<Reward>> CreateRewardAsync(int ownerId,
             Model.Options.CreateRewardOptions options)
         {
             if (ownerId <= 0 ||
               options == null) {
-                return null;
+                return new ApiResult<Reward>(
+                    StatusCode.BadRequest, "Null options");
             }
 
             if (string.IsNullOrWhiteSpace(options.Title) ||
                  string.IsNullOrWhiteSpace(options.Description) ||
                      options.Value == 0) {
-                return null;
+                return new ApiResult<Reward>(
+                    StatusCode.BadRequest, "Null Title Or Description");
             }
 
-            var owner = owners_.SearchOwnerById(ownerId);
+            //RE FUGE  RE MALAKA apo dw RE BRO
+            var owner = await owners_.SearchOwnerByIdAsync(ownerId);
 
             if (owner == null) {
-                return null;
+                return new ApiResult<Reward>(
+                     StatusCode.BadRequest, "Owner Was not Found");
             }
 
             var reward = new Reward()
@@ -45,10 +51,10 @@ namespace Crowdfund.Core.Services {
                 Owner = owner,
                 Title = options.Title,
                 Description = options.Description,
-                Value = options.Value
+                Value = options.Value   
             };
 
-            var result = owners_.AddReward(ownerId, reward);
+            var result = await owners_.AddRewardAsync(ownerId, reward);
 
             if (result == false) {
                 return null;
@@ -57,23 +63,33 @@ namespace Crowdfund.Core.Services {
             context_.Add(reward);
 
             try {
-                context_.SaveChanges();
+              await  context_.SaveChangesAsync();
             } catch (Exception ex) {
-                return null;
+                return new ApiResult<Reward>(
+                      StatusCode.InternalServerError, "Reward Was Not Added");
             }
 
-            return reward;
+             return ApiResult<Reward>.CreateSuccess(reward); 
         }
 
-        public Reward SearchRewardById(int rewardId)
+        public async Task<ApiResult<Reward>> SearchRewardByIdAsync(int rewardId)
         {
             if (rewardId <= 0) {
-                return null;
+                return new ApiResult<Reward>(
+                       StatusCode.BadRequest, "Reward Invalid");
             }
-            return context_
+            var reward = await context_
                 .Set<Reward>()
                 .Where(s => s.Id == rewardId)
-                .SingleOrDefault();
+                .SingleOrDefaultAsync();
+
+            if (reward == null) {
+
+                return new ApiResult<Reward>(
+                      StatusCode.BadRequest, "Reward Was Not Found");
+            }
+
+            return ApiResult<Reward>.CreateSuccess(reward);
         }
     }
 }

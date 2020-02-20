@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Crowdfund.Core.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Core.Services {
     public class ProjectService : IProjectService
@@ -20,34 +22,39 @@ namespace Crowdfund.Core.Services {
             rewards_ = reward;
         }
 
-        public Project CreateProject(int ownerId,
+        public async Task <ApiResult<Project>> CreateProjectAsync(int ownerId,
             Model.Options.CreateProjectOptions options)
         {
             if (options == null) {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, "Null options");
             }
 
             if (string.IsNullOrWhiteSpace(options.Title) ||
               string.IsNullOrWhiteSpace(options.Description)) {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, "Null Title or Description");
             }
 
             if (options.projectcategory < 0 )
             {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, " Project Category is Invlaid");
             }
 
-            var owner = owners_.SearchOwnerById(ownerId);
+            var owner =  owners_.SearchOwnerById(ownerId);
 
             if (owner == null) {
-                return null;
+                return new ApiResult<Project>(
+                    StatusCode.NotFound, "Project Creator Doesn't Exist");
             }
 
             // only once every title && description
-            var exist = GetProjectId(options.Title, options.Description);
+            var exist = await GetProjectIdAsync(options.Title, options.Description);
 
             if (exist !=0 ) {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, "Project Already Exists");
             }
 
             var project = new Project()
@@ -62,15 +69,16 @@ namespace Crowdfund.Core.Services {
 
             owner.Projects.Add(project);
 
-            context_.Add(project);
+           await context_.AddAsync(project);
             try {
-                context_.SaveChanges();
+                await context_.SaveChangesAsync();
             } catch (Exception ex) {
 
-                return null;
+                return new ApiResult<Project>(
+                      StatusCode.InternalServerError, "Project Was Not Added");
             }
 
-            return project;
+            return ApiResult<Project>.CreateSuccess(project);
         }
 
         public IQueryable<Project> SearchProject(
@@ -112,7 +120,7 @@ namespace Crowdfund.Core.Services {
             return query.Take(500);
         }
 
-        public bool ChangeProjectStatus(int projectid, ProjectStatus Status)
+        public async Task<bool> ChangeProjectStatusAsync(int projectid, ProjectStatus Status)
         {
             if (projectid <= 0) {
                 return false;
@@ -122,39 +130,38 @@ namespace Crowdfund.Core.Services {
                 return false;
             }
 
-            var project = SearchProjectById(projectid);
+            var project = await SearchProjectByIdAsync(projectid);
 
             if (project == null) {
                 return false;
             }
 
-            project.Status = Status;
-
-            context_.Update(project);
+            project.Data.Status = Status;
+ 
             var success = false;
             try {
-                success = context_.SaveChanges() > 0;
+                success = await context_.SaveChangesAsync() > 0;
             } catch (Exception ex) {
 
             }
             return success;
         }
 
-        public Project SearchProjectById (int projectId)
+        public async Task<ApiResult<Project>> SearchProjectByIdAsync(int projectId)
         {
             if (projectId <= 0) {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, " Project Was Not Found");
             }
 
-            return context_
+            var project =  await context_
                 .Set<Project>()
-                .SingleOrDefault(s => s.Id == projectId);
+                .SingleOrDefaultAsync(s => s.Id == projectId);
+
+            return ApiResult<Project>.CreateSuccess(project);
         }
 
-
-        //not sure!!
-        // Not tested!!
-        public bool BuyProject(int projectId, int buyerId,
+        public async Task<bool> BuyProjectAsync(int projectId, int buyerId,
             int rewardId)
         {
             if (projectId == 0 ||
@@ -163,20 +170,23 @@ namespace Crowdfund.Core.Services {
                 return false;
             }
 
-            var project = SearchProjectById(projectId);
+            var project = await SearchProjectByIdAsync(projectId);
 
             if (project == null) {
                 return false;
             }
 
-            project.Buyers.Add(
+            project.Data.Buyers.Add(
                 new ProjectBuyer()
                 {
-                    ProjectId = project.Id,
+                    ProjectId = project.Data.Id,
                     BuyerId = buyerId
                 });
 
-            var reward = rewards_.SearchRewardById(rewardId);
+
+            //Must change Below
+
+            var reward = await rewards_.SearchRewardByIdAsync(rewardId);
 
             if (reward == null) {
                 return false;
@@ -193,7 +203,7 @@ namespace Crowdfund.Core.Services {
 
         }
 
-        public int GetProjectId(string title, string Desc)
+        public async Task<int> GetProjectIdAsync(string title, string Desc)
         {
             if (string.IsNullOrWhiteSpace(title)) {
                 return 0;
@@ -214,7 +224,7 @@ namespace Crowdfund.Core.Services {
                     c.Description == Desc);
 
 
-            var pr = query.SingleOrDefault();
+            var pr = await query.SingleOrDefaultAsync();
             if (pr == null) {
                 return 0;
             } else {

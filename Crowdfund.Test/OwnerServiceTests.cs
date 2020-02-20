@@ -6,6 +6,7 @@ using Autofac;
 
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
+using System.Threading.Tasks;
 
 namespace Crowdfund.Test {
     public partial class OwnerServiceTests
@@ -18,7 +19,7 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void CreateOwnerSuccess()
+        public async Task CreateOwnerSuccessAsync()
         {
             var ran = DateTime.Now.Second;
             var option = new CreateOwnerOptions()
@@ -29,16 +30,16 @@ namespace Crowdfund.Test {
                 Age = 35
             };
 
-            var owner = osvc_.CreateOwner(option);
+            var owner = await osvc_.CreateOwnerAsync(option);
 
             Assert.NotNull(owner);
 
-            var search = osvc_.SearchOwner(
+            var search = await osvc_.SearchOwnerAsync(
                 new SearchOwnerOptions()
                 {
                     Email = $"stavriddim{ran}@gmail.com"
                 }
-                ).ToList();
+                ).ToListAsync();
 
             Assert.NotNull(search);
             Assert.Equal(option.FirstName, owner.FirstName);
@@ -47,7 +48,7 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void CreateOwnerFail_EmailIsNotUnique()
+        public async Task CreateOwnerFail_EmailIsNotUniqueAsync()
         {
             var option = new CreateOwnerOptions()
             {
@@ -56,11 +57,11 @@ namespace Crowdfund.Test {
                 Email = "stavriddim@gmail.com"
             };
 
-            var owner = osvc_.CreateOwner(option);
+            var owner = await osvc_.CreateOwnerAsync(option);
 
             Assert.NotNull(owner);
 
-            var search = osvc_.SearchOwner(
+            var search = await osvc_.SearchOwnerAsync(
                 new SearchOwnerOptions()
                 {
                     Email = "stavriddim@gmail.com"
@@ -74,7 +75,7 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void CreateOwnerFail_Age()
+        public async Task CreateOwnerFail_AgeAsync()
         {
             var option = new CreateOwnerOptions()
             {
@@ -84,36 +85,36 @@ namespace Crowdfund.Test {
                 Age = 10
             };
 
-            var owner = osvc_.CreateOwner(option);
+            var owner = await osvc_.CreateOwnerAsync(option);
 
             Assert.NotNull(owner);
         }
 
         [Fact]
-        public void SearchOwnerById_Success()
+        public async Task SearchOwnerById_SuccessAsync()
         {
-            var search = osvc_.SearchOwner(
+            var search = await osvc_.SearchOwnerAsync(
                 new SearchOwnerOptions()
                 {
                     Email = "stavriddim@gmail.com"
                 }
-                ).SingleOrDefault();
+                ).SingleOrDefaultAsync();
 
             Assert.NotNull(search);
 
-            var idSearch = osvc_.SearchOwnerById(search.Id);
+            var idSearch = await osvc_.SearchOwnerByIdAsync(search.Id);
             Assert.Equal(search.Email, idSearch.Email);
         }
 
         [Fact]
-        public void UpdateOwner_Success()
+        public async Task UpdateOwner_SuccessAsync()
         {
             var option = new UpdateOwnerOptions()
             {
                 FirstName = $"Dimitris{DateTime.Now.Second}",                             
             };
 
-            var isUpdated = osvc_.UpdateOwner(3, option);
+            var isUpdated = await osvc_.UpdateOwnerAsync(3, option);
 
             Assert.True(isUpdated);
         }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 
 namespace Crowdfund.Core.Services {
     public interface IProjectService 
     {
-        Project CreateProject( int ownerId,
+        Task<ApiResult<Project>> CreateProjectAsync( int ownerId,
             Model.Options.CreateProjectOptions options);
 
         IQueryable<Project> SearchProject(
@@ -15,15 +16,15 @@ namespace Crowdfund.Core.Services {
         IQueryable<Project> SearchProjectByCstegory(
             ProjectCategory category);
 
-        bool ChangeProjectStatus(int projectId,
+       Task <bool> ChangeProjectStatusAsync(int projectId,
             ProjectStatus Status);
 
-        Project SearchProjectById(int projectId);
+        Task<ApiResult<Project>> SearchProjectByIdAsync(int projectId);
 
         // bool ProjectStatusUpdate(Project id);
 
-        bool BuyProject(int projectId, int buyerId, int rewardId);
+        Task<bool> BuyProjectAsync(int projectId, int buyerId, int rewardId);
         
-        public int GetProjectId(string title, string Desc);
+         Task<int> GetProjectIdAsync(string title, string Desc);
     }
 }
