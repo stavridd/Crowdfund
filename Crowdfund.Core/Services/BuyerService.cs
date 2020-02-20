@@ -26,7 +26,7 @@ namespace Crowdfund.Core.Services {
                 return null;
             }
 
-            if(options.Age == 0 ||
+            if (options.Age == 0 ||
                     options.Age < 18) {
                 return null;
             }
@@ -129,7 +129,6 @@ namespace Crowdfund.Core.Services {
                 buyer.Age = options.Age;
             }
 
-            //context_.Update(buyer);
             var success = false;
             try {
                 success = context_.SaveChanges() > 0;
