@@ -6,6 +6,7 @@ using Autofac;
 
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
+using System.Threading.Tasks;
 
 namespace Crowdfund.Test {
     public partial class RewardServiceTests : IClassFixture<CrowdfundFixture>
@@ -21,7 +22,7 @@ namespace Crowdfund.Test {
 
 
         [Fact]
-        public void CreateRewardSuccess()
+        public async Task CreateRewardSuccess()
         {
             var option = new CreateRewardOptions()
             {
@@ -31,8 +32,8 @@ namespace Crowdfund.Test {
                 Value =  775.12M
             };
 
-            var reward = rsvc_.CreateReward(2,option);
-            var owner = osvc_.SearchOwnerById(2);
+            var reward = await rsvc_.CreateRewardAsync(2,option);
+            var owner = await osvc_.SearchOwnerByIdAsync(2);
 
             var exist = owner.Rewards.Contains(reward);
 
