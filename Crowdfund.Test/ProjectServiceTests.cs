@@ -20,7 +20,7 @@ namespace Crowdfund.Test {
 
 
         [Fact]
-        public async Task CreateProjectSuccessAsync()
+        public async Task CreateProjectSuccess()
         {
             var option = new CreateProjectOptions()
             {
@@ -30,13 +30,13 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project = psvc_.CreateProject(2,option);
+            var project = await psvc_.CreateProjectAsync(1,option);
 
             Assert.NotNull(project);
         }
 
         [Fact]
-        public async Task CreateProjectFail_SameTitleAsync()
+        public async Task CreateProjectFail_SameTitle()
         {
             var option = new CreateProjectOptions()
             {
@@ -45,13 +45,13 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project = await psvc_.CreateProjectAsync(2, option);
+            var project = await psvc_.CreateProjectAsync(1, option);
 
             Assert.NotNull(project);
         }
 
         [Fact]
-        public void SearchProjectSuccess()
+        public async Task SearchProjectSuccess()
         {
             var rand = DateTime.Now.Second;
 
@@ -62,14 +62,14 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project =  await psvc_.CreateProjectAsync(3, option);
+            var project =  await psvc_.CreateProjectAsync(1, option);
 
             var search = new SearchProjectOptions()
             {
                 Title = $"This is a Test Project {rand}",
             };
 
-            var pr = await psvc_.SearchProjectAsync(search);
+            var pr =  psvc_.SearchProject(search);
 
             Assert.NotNull(pr);
             Assert.Contains($"This is a Test Project {rand}",
@@ -77,10 +77,10 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public async Task SearchProjectByIdSuccessAsync()
+        public void SearchProjectByIdSuccess()
         {
             
-            var pr = await psvc_.SearchProjectByCstegoryAsync(
+            var pr =  psvc_.SearchProjectByCstegory( 
                  Core.Model.ProjectCategory.DesignAndTech);
 
             Assert.NotNull(pr);
@@ -91,14 +91,14 @@ namespace Crowdfund.Test {
         public async Task ChangeProjectStatusSuccessAsync()
         {
 
-            var pr = await psvc_.ChangeProjectStatusAsync(1,
+            var pr = await psvc_.ChangeProjectStatusAsync(3,
                 Core.Model.ProjectStatus.Completed);
             
             Assert.True(pr);
 
-            var result = await psvc_.SearchProjectByIdAsync(1);
+            var result = await psvc_.SearchProjectByIdAsync(3);
 
-            var stat = result.Status.ToString();
+            var stat = result.Data.Status.ToString();
 
             Assert.Matches("Completed", stat);   
         }
@@ -107,12 +107,12 @@ namespace Crowdfund.Test {
         public async Task GetProjectIdSuccessAsync()
         {
 
-            var title = "This is a Test Project 29";
+            var title = "This is a Test Project 41";
             var Desc = "This is the first test project";
 
             var Id = await psvc_.GetProjectIdAsync(title, Desc);
 
-            Assert.Equal(4, Id);
+            Assert.Equal(1, Id);
 
         }
     }

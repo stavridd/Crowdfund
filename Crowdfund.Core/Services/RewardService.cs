@@ -48,7 +48,7 @@ namespace Crowdfund.Core.Services {
 
             var reward = new Reward()
             {
-                Owner = owner,
+                Owner = owner.Data,
                 Title = options.Title,
                 Description = options.Description,
                 Value = options.Value   

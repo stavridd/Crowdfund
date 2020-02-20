@@ -42,7 +42,7 @@ namespace Crowdfund.Core.Services {
                      StatusCode.BadRequest, " Project Category is Invlaid");
             }
 
-            var owner =  owners_.SearchOwnerById(ownerId);
+            var owner = await owners_.SearchOwnerByIdAsync(ownerId);
 
             if (owner == null) {
                 return new ApiResult<Project>(
@@ -61,13 +61,13 @@ namespace Crowdfund.Core.Services {
             {
                 Title = options.Title,
                 Description = options.Description,
-                projectcategory = options.projectcategory, 
-                Owner = owner
+                projectcategory = options.projectcategory,
+                Owner = owner.Data
             };
 
 
 
-            owner.Projects.Add(project);
+            owner.Data.Projects.Add(project);
 
            await context_.AddAsync(project);
             try {
@@ -192,7 +192,7 @@ namespace Crowdfund.Core.Services {
                 return false;
             }
 
-            reward.Buyers.Add(
+            reward.Data.Buyers.Add(
                 new BuyerReward()
                 {
                     RewardId = rewardId,

@@ -7,6 +7,7 @@ using Autofac;
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Test {
     public partial class OwnerServiceTests
@@ -19,7 +20,7 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public async Task CreateOwnerSuccessAsync()
+        public async Task CreateOwnerSuccess()
         {
             var ran = DateTime.Now.Second;
             var option = new CreateOwnerOptions()
@@ -34,7 +35,7 @@ namespace Crowdfund.Test {
 
             Assert.NotNull(owner);
 
-            var search = await osvc_.SearchOwnerAsync(
+            var search = await osvc_.SearchOwner(
                 new SearchOwnerOptions()
                 {
                     Email = $"stavriddim{ran}@gmail.com"
@@ -42,36 +43,38 @@ namespace Crowdfund.Test {
                 ).ToListAsync();
 
             Assert.NotNull(search);
-            Assert.Equal(option.FirstName, owner.FirstName);
-            Assert.Equal(option.LastName, owner.LastName);
-            Assert.Equal(option.Email, owner.Email);
+            Assert.Equal(option.FirstName, owner.Data.FirstName);
+            Assert.Equal(option.LastName, owner.Data.LastName);
+            Assert.Equal(option.Email, owner.Data.Email);
         }
 
         [Fact]
-        public async Task CreateOwnerFail_EmailIsNotUniqueAsync()
+        public async Task CreateOwnerFail_EmailIsNotUnique()
         {
+            var ran = DateTime.Now.Second;
             var option = new CreateOwnerOptions()
             {
                 FirstName = $"Dimitris{DateTime.Now.Second}",
                 LastName = "Stavridis",
-                Email = "stavriddim@gmail.com"
+                Email = $"stavriddim{ran}@gmail.com",
+                Age = 80
             };
 
             var owner = await osvc_.CreateOwnerAsync(option);
 
             Assert.NotNull(owner);
 
-            var search = await osvc_.SearchOwnerAsync(
-                new SearchOwnerOptions()
-                {
-                    Email = "stavriddim@gmail.com"
-                }
-                ).ToList();
+            var option2 = new CreateOwnerOptions()
+            {
+                FirstName = $"Dimitris{DateTime.Now.Second}",
+                LastName = "Stavridis",
+                Email = $"stavriddim{ran}@gmail.com",
+                Age = 80
+            };
 
-            Assert.NotNull(search);
-            Assert.Equal(option.FirstName, owner.FirstName);
-            Assert.Equal(option.LastName, owner.LastName);
-            Assert.Equal(option.Email, owner.Email);
+            var owner2 = await osvc_.CreateOwnerAsync(option2);
+
+            Assert.Null(owner2.Data);
         }
 
         [Fact]
@@ -93,17 +96,17 @@ namespace Crowdfund.Test {
         [Fact]
         public async Task SearchOwnerById_SuccessAsync()
         {
-            var search = await osvc_.SearchOwnerAsync(
+            var search = await osvc_.SearchOwner(
                 new SearchOwnerOptions()
                 {
-                    Email = "stavriddim@gmail.com"
+                    Email = "stavriddim28@gmail.com"
                 }
                 ).SingleOrDefaultAsync();
 
             Assert.NotNull(search);
 
             var idSearch = await osvc_.SearchOwnerByIdAsync(search.Id);
-            Assert.Equal(search.Email, idSearch.Email);
+            Assert.Equal(search.Email, idSearch.Data.Email);
         }
 
         [Fact]
@@ -111,12 +114,12 @@ namespace Crowdfund.Test {
         {
             var option = new UpdateOwnerOptions()
             {
-                FirstName = $"Dimitris{DateTime.Now.Second}",                             
+                FirstName = $"Dimitris88888",                             
             };
 
-            var isUpdated = await osvc_.UpdateOwnerAsync(3, option);
+            var isUpdated = await osvc_.UpdateOwnerAsync(2, option);
 
-            Assert.True(isUpdated);
+            Assert.Equal(option.FirstName, isUpdated.Data.FirstName);
         }
     }
 }

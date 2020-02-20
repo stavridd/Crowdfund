@@ -29,13 +29,13 @@ namespace Crowdfund.Test {
                 Title = $"The First Reward test{DateTime.Now.Millisecond}",
                 Description = $"This is the first reward you can buy" +
                                 $"{DateTime.Now.Millisecond}",
-                Value =  775.12M
+                Value =  775.72M
             };
 
-            var reward = await rsvc_.CreateRewardAsync(2,option);
-            var owner = await osvc_.SearchOwnerByIdAsync(2);
+            var reward = await rsvc_.CreateRewardAsync(1,option);
+            var owner = await osvc_.SearchOwnerByIdAsync(1);
 
-            var exist = owner.Rewards.Contains(reward);
+            var exist = owner.Data.Rewards.Contains(reward.Data);
 
             Assert.NotNull(reward);
             Assert.True(exist);

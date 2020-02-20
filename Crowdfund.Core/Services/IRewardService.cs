@@ -10,6 +10,6 @@ namespace Crowdfund.Core.Services {
         Task<ApiResult<Reward>> CreateRewardAsync(int ownerId,
             Model.Options.CreateRewardOptions options);
 
-        Task<ApiResult<Reward>> SearchRewardByIdSAsync(int rewardId);
+        Task<ApiResult<Reward>> SearchRewardByIdAsync(int rewardId);
     }
 }

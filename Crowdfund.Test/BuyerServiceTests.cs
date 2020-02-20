@@ -7,6 +7,7 @@ using Autofac;
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Test {
     public partial class BuyerServiceTests
@@ -35,7 +36,7 @@ namespace Crowdfund.Test {
 
             Assert.NotNull(buyer);
 
-            var search = await bsvc_.SearchBuyerAsync(
+            var search = bsvc_.SearchBuyer(
                 new SearchBuyerOptions()
                 {
                     Email = $"alejandro{ran}@gmail.com"
@@ -43,40 +44,46 @@ namespace Crowdfund.Test {
                 ).ToList();
 
             Assert.NotNull(search);
-            Assert.Equal(option.FirstName, buyer.FirstName);
-            Assert.Equal(option.LastName, buyer.LastName);
-            Assert.Equal(option.Email, buyer.Email);
+            Assert.Equal(option.FirstName, buyer.Data.FirstName);
+            Assert.Equal(option.LastName, buyer.Data.LastName);
+            Assert.Equal(option.Email, buyer.Data.Email);
         }
 
         [Fact]
         public async Task CreateBuyerFail_EmailIsNotUnique()
         {
+            Random random = new Random();
+            var num = random.Next(1, 1000);
             var option = new CreateBuyerOptions()
             {
                 FirstName = $"Alex{DateTime.Now.Second}",
                 LastName = "Athanasiou",
-                Email = "alejandro@gmail.com"
+                Email = $"alejandro{num}@gmail.com",
+                Age = 19
             };
 
             var buyer = await bsvc_.CreateBuyerAsync(option);
 
             Assert.NotNull(buyer);
 
-            var search = await bsvc_.SearchBuyerAsync(
-                new SearchBuyerOptions()
-                {
-                    Email = "alejandro@gmail.com"
-                }
-                ).ToListAsync();
+            var option2 = new CreateBuyerOptions()
+            {
+                FirstName = $"Alex{DateTime.Now.Second}",
+                LastName = "Athanassiou",
+                Email = $"alejandro{num}@gmail.com",
+                Age = 19
+            };
 
-            Assert.NotNull(search);
-            Assert.Equal(option.FirstName, buyer.FirstName);
-            Assert.Equal(option.LastName, buyer.LastName);
-            Assert.Equal(option.Email, buyer.Email);
+            var buyer2 = await bsvc_.CreateBuyerAsync(option2);
+
+            Assert.Null(buyer2.Data);
+
+           
+            
         }
 
         [Fact]
-        public async Task CreateBuyerFail_AgeAsync()
+        public async Task CreateBuyerFail_Age()
         {
             var option = new CreateBuyerOptions()
             {
@@ -94,17 +101,17 @@ namespace Crowdfund.Test {
         [Fact]
         public async Task SearchBuyerById_Success()
         {
-            var search = await bsvc_.SearchBuyerAsync(
+            var search = await bsvc_.SearchBuyer(
                 new SearchBuyerOptions()
                 {
-                    Email = "alejandro@gmail.com"
+                    Email = "alejandro43@gmail.com"
                 }
                 ).SingleOrDefaultAsync();
 
             Assert.NotNull(search);
 
             var idSearch = await bsvc_.SearchBuyerByIdAsync(search.Id);
-            Assert.Equal(search.Email, idSearch.Email);
+            Assert.Equal(search.Email, idSearch.Data.Email);
         }
 
         [Fact]
@@ -117,7 +124,7 @@ namespace Crowdfund.Test {
 
             var isUpdated = await bsvc_.UpdateBuyerAsync(1, option);
 
-            Assert.True(isUpdated);
+            Assert.Equal(option.Age, isUpdated.Data.Age);
         }
     }
 }
