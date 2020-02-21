@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Crowdfund.Core.Model {
     public class Owner {
@@ -36,7 +37,7 @@ namespace Crowdfund.Core.Model {
         /// <summary>
         /// A list with all the projects of the Project Creator
         /// </summary>
-        public ICollection<Project> Projects { get; set; }
+        public  ICollection<Project> Projects { get; set; }
 
         /// <summary>
         /// A list with all the project Rewards

@@ -6,7 +6,8 @@ using Autofac;
 
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
-
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Test {
     public partial class BuyerServiceTests
@@ -20,7 +21,7 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void CreateBuyerSuccess()
+        public async Task CreateBuyerSuccess()
         {
             var ran =  DateTime.Now.Second;
             var option = new CreateBuyerOptions()
@@ -31,7 +32,7 @@ namespace Crowdfund.Test {
                 Age = 58
             };
 
-            var buyer = bsvc_.CreateBuyer(option);
+            var buyer = await bsvc_.CreateBuyerAsync(option);
 
             Assert.NotNull(buyer);
 
@@ -43,40 +44,46 @@ namespace Crowdfund.Test {
                 ).ToList();
 
             Assert.NotNull(search);
-            Assert.Equal(option.FirstName, buyer.FirstName);
-            Assert.Equal(option.LastName, buyer.LastName);
-            Assert.Equal(option.Email, buyer.Email);
+            Assert.Equal(option.FirstName, buyer.Data.FirstName);
+            Assert.Equal(option.LastName, buyer.Data.LastName);
+            Assert.Equal(option.Email, buyer.Data.Email);
         }
 
         [Fact]
-        public void CreateBuyerFail_EmailIsNotUnique()
+        public async Task CreateBuyerFail_EmailIsNotUnique()
         {
+            Random random = new Random();
+            var num = random.Next(1, 1000);
             var option = new CreateBuyerOptions()
             {
                 FirstName = $"Alex{DateTime.Now.Second}",
                 LastName = "Athanasiou",
-                Email = "alejandro@gmail.com"
+                Email = $"alejandro{num}@gmail.com",
+                Age = 19
             };
 
-            var buyer = bsvc_.CreateBuyer(option);
+            var buyer = await bsvc_.CreateBuyerAsync(option);
 
             Assert.NotNull(buyer);
 
-            var search = bsvc_.SearchBuyer(
-                new SearchBuyerOptions()
-                {
-                    Email = "alejandro@gmail.com"
-                }
-                ).ToList();
+            var option2 = new CreateBuyerOptions()
+            {
+                FirstName = $"Alex{DateTime.Now.Second}",
+                LastName = "Athanassiou",
+                Email = $"alejandro{num}@gmail.com",
+                Age = 19
+            };
 
-            Assert.NotNull(search);
-            Assert.Equal(option.FirstName, buyer.FirstName);
-            Assert.Equal(option.LastName, buyer.LastName);
-            Assert.Equal(option.Email, buyer.Email);
+            var buyer2 = await bsvc_.CreateBuyerAsync(option2);
+
+            Assert.Null(buyer2.Data);
+
+           
+            
         }
 
         [Fact]
-        public void CreateBuyerFail_Age()
+        public async Task CreateBuyerFail_Age()
         {
             var option = new CreateBuyerOptions()
             {
@@ -86,38 +93,38 @@ namespace Crowdfund.Test {
                 Age = 10
             };
 
-            var buyer = bsvc_.CreateBuyer(option);
+            var buyer = await bsvc_.CreateBuyerAsync(option);
 
             Assert.NotNull(buyer);
         }
 
         [Fact]
-        public void SearchBuyerById_Success()
+        public async Task SearchBuyerById_Success()
         {
-            var search = bsvc_.SearchBuyer(
+            var search = await bsvc_.SearchBuyer(
                 new SearchBuyerOptions()
                 {
-                    Email = "alejandro@gmail.com"
+                    Email = "alejandro43@gmail.com"
                 }
-                ).SingleOrDefault();
+                ).SingleOrDefaultAsync();
 
             Assert.NotNull(search);
 
-            var idSearch = bsvc_.SearchBuyerById(search.Id);
-            Assert.Equal(search.Email, idSearch.Email);
+            var idSearch = await bsvc_.SearchBuyerByIdAsync(search.Id);
+            Assert.Equal(search.Email, idSearch.Data.Email);
         }
 
         [Fact]
-        public void UpdateBuyer_Success()
+        public async Task UpdateBuyer_Success()
         {
             var option = new UpdateBuyerOptions()
             {
                 Age = 35
             };
 
-            var isUpdated = bsvc_.UpdateBuyer(1, option);
+            var isUpdated = await bsvc_.UpdateBuyerAsync(1, option);
 
-            Assert.True(isUpdated);
+            Assert.Equal(option.Age, isUpdated.Data.Age);
         }
     }
 }

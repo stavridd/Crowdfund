@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Crowdfund.Core.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Core.Services {
     public class ProjectService : IProjectService
@@ -10,67 +12,79 @@ namespace Crowdfund.Core.Services {
         private readonly Data.CrowdfundDbContext context_;
         private readonly IOwnerService owners_;
         private readonly IRewardService rewards_;
+        private readonly IOwnerService owner;
 
         public ProjectService(Data.CrowdfundDbContext context,
-                  IOwnerService owners, IRewardService reward)
+                  IRewardService reward, IOwnerService owner)
         {
             context_ = context ??
                 throw new ArgumentException(nameof(context));
-            owners_ = owners;
             rewards_ = reward;
+            owners_ = owner;
         }
 
-        public Project CreateProject(int ownerId,
+        public async Task <ApiResult<Project>> CreateProjectAsync(int ownerId,
             Model.Options.CreateProjectOptions options)
         {
             if (options == null) {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, "Null options");
+            }
+
+            if (ownerId == 0) {
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, "Null Project Creator's Id");
             }
 
             if (string.IsNullOrWhiteSpace(options.Title) ||
               string.IsNullOrWhiteSpace(options.Description)) {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, "Null Title or Description");
             }
 
             if (options.projectcategory < 0 )
             {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, " Project Category is Invlaid");
             }
 
-            var owner = owners_.SearchOwnerById(ownerId);
+            var owner = await owners_.SearchOwnerByIdAsync(ownerId);
 
             if (owner == null) {
-                return null;
+                return new ApiResult<Project>(
+                    StatusCode.NotFound, "Project Creator Doesn't Exist");
             }
 
             // only once every title && description
-            var exist = GetProjectId(options.Title, options.Description);
+            var exist = await GetProjectIdAsync(options.Title, options.Description);
 
             if (exist !=0 ) {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, "Project Already Exists");
             }
 
             var project = new Project()
             {
                 Title = options.Title,
                 Description = options.Description,
-                projectcategory = options.projectcategory, 
-                Owner = owner
+                projectcategory = options.projectcategory,
+                Owner = owner.Data
             };
 
 
 
-            owner.Projects.Add(project);
+           owner.Data.Projects.Add(project);
 
-            context_.Add(project);
+           await context_.AddAsync(project);
             try {
-                context_.SaveChanges();
+                await context_.SaveChangesAsync();
             } catch (Exception ex) {
 
-                return null;
+                return new ApiResult<Project>(
+                      StatusCode.InternalServerError, "Project Was Not Added");
             }
 
-            return project;
+            return ApiResult<Project>.CreateSuccess(project);
         }
 
         public IQueryable<Project> SearchProject(
@@ -112,7 +126,7 @@ namespace Crowdfund.Core.Services {
             return query.Take(500);
         }
 
-        public bool ChangeProjectStatus(int projectid, ProjectStatus Status)
+        public async Task<bool> ChangeProjectStatusAsync(int projectid, ProjectStatus Status)
         {
             if (projectid <= 0) {
                 return false;
@@ -122,39 +136,39 @@ namespace Crowdfund.Core.Services {
                 return false;
             }
 
-            var project = SearchProjectById(projectid);
+            var project = await SearchProjectByIdAsync(projectid);
 
             if (project == null) {
                 return false;
             }
 
-            project.Status = Status;
+            project.Data.Status = Status;
+           
 
-            context_.Update(project);
             var success = false;
             try {
-                success = context_.SaveChanges() > 0;
+                success = await context_.SaveChangesAsync() > 0;
             } catch (Exception ex) {
 
             }
             return success;
         }
 
-        public Project SearchProjectById (int projectId)
+        public async Task<ApiResult<Project>> SearchProjectByIdAsync(int projectId)
         {
             if (projectId <= 0) {
-                return null;
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, " Project Was Not Found");
             }
 
-            return context_
+            var project =  await context_
                 .Set<Project>()
-                .SingleOrDefault(s => s.Id == projectId);
+                .SingleOrDefaultAsync(s => s.Id == projectId);
+
+            return ApiResult<Project>.CreateSuccess(project);
         }
 
-
-        //not sure!!
-        // Not tested!!
-        public bool BuyProject(int projectId, int buyerId,
+        public async Task<bool> BuyProjectAsync(int projectId, int buyerId,
             int rewardId)
         {
             if (projectId == 0 ||
@@ -163,37 +177,55 @@ namespace Crowdfund.Core.Services {
                 return false;
             }
 
-            var project = SearchProjectById(projectId);
+            var project = await SearchProjectByIdAsync(projectId);
 
             if (project == null) {
                 return false;
             }
 
-            project.Buyers.Add(
+            if (project.Data.Status != ProjectStatus.Active) {
+                return false;
+            }
+            project.Data.Buyers.Add(
                 new ProjectBuyer()
                 {
-                    ProjectId = project.Id,
+                    ProjectId = project.Data.Id,
                     BuyerId = buyerId
                 });
 
-            var reward = rewards_.SearchRewardById(rewardId);
+            //Must change Below
+
+            var reward = await rewards_.SearchRewardByIdAsync(rewardId);
 
             if (reward == null) {
                 return false;
             }
 
-            reward.Buyers.Add(
+            reward.Data.Buyers.Add(
                 new BuyerReward()
                 {
                     RewardId = rewardId,
                     BuyerId = buyerId
                 });
-            
+
+            project.Data.Contributions = project.Data.Contributions + reward.Data.Value;
+
+            if(project.Data.Contributions > project.Data.Goal) {
+                project.Data.Status = ProjectStatus.Completed;
+            }
+
+            try {
+                await context_.SaveChangesAsync();
+            } catch (Exception ex) {
+
+                return false;
+            }
+
             return true;
 
         }
 
-        public int GetProjectId(string title, string Desc)
+        public async Task<int> GetProjectIdAsync(string title, string Desc)
         {
             if (string.IsNullOrWhiteSpace(title)) {
                 return 0;
@@ -214,12 +246,14 @@ namespace Crowdfund.Core.Services {
                     c.Description == Desc);
 
 
-            var pr = query.SingleOrDefault();
+            var pr = await query.SingleOrDefaultAsync();
             if (pr == null) {
                 return 0;
             } else {
                 return pr.Id;
             }
         }
+
+
     }
 }

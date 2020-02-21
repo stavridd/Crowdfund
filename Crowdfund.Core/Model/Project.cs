@@ -49,6 +49,8 @@ namespace Crowdfund.Core.Model {
         /// </summary>
         public Owner Owner { get; set; }
 
+        public int OwnerId { get; set; }
+
         public decimal Goal { get; set; }
 
         public int NumberOfContributions { get; set; }
@@ -61,6 +63,7 @@ namespace Crowdfund.Core.Model {
             Multis = new List<Multimedia>();
             Updates = new List<StatusUpdates>();
             Status = ProjectStatus.Active;
+            Contributions = 0;
         }
     }
 }

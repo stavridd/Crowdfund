@@ -6,19 +6,23 @@ using Autofac;
 
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Test {
     public partial class OwnerServiceTests
                     : IClassFixture<CrowdfundFixture> {
         private readonly IOwnerService osvc_;
+        private readonly IProjectService psvc_;
 
         public OwnerServiceTests(CrowdfundFixture fixture)
         {
             osvc_ = fixture.Container.Resolve<IOwnerService>();
+            psvc_ = fixture.Container.Resolve<IProjectService>();
         }
 
         [Fact]
-        public void CreateOwnerSuccess()
+        public async Task CreateOwnerSuccess()
         {
             var ran = DateTime.Now.Second;
             var option = new CreateOwnerOptions()
@@ -29,52 +33,54 @@ namespace Crowdfund.Test {
                 Age = 35
             };
 
-            var owner = osvc_.CreateOwner(option);
+            var owner = await osvc_.CreateOwnerAsync(option);
 
             Assert.NotNull(owner);
 
-            var search = osvc_.SearchOwner(
+            var search = await osvc_.SearchOwner(
                 new SearchOwnerOptions()
                 {
                     Email = $"stavriddim{ran}@gmail.com"
                 }
-                ).ToList();
+                ).ToListAsync();
 
             Assert.NotNull(search);
-            Assert.Equal(option.FirstName, owner.FirstName);
-            Assert.Equal(option.LastName, owner.LastName);
-            Assert.Equal(option.Email, owner.Email);
+            Assert.Equal(option.FirstName, owner.Data.FirstName);
+            Assert.Equal(option.LastName, owner.Data.LastName);
+            Assert.Equal(option.Email, owner.Data.Email);
         }
 
         [Fact]
-        public void CreateOwnerFail_EmailIsNotUnique()
+        public async Task CreateOwnerFail_EmailIsNotUnique()
         {
+            var ran = DateTime.Now.Second;
             var option = new CreateOwnerOptions()
             {
                 FirstName = $"Dimitris{DateTime.Now.Second}",
                 LastName = "Stavridis",
-                Email = "stavriddim@gmail.com"
+                Email = $"stavriddim{ran}@gmail.com",
+                Age = 80
             };
 
-            var owner = osvc_.CreateOwner(option);
+            var owner = await osvc_.CreateOwnerAsync(option);
 
             Assert.NotNull(owner);
 
-            var search = osvc_.SearchOwner(
-                new SearchOwnerOptions()
-                {
-                    Email = "stavriddim@gmail.com"
-                }
-                ).ToList();
+            var option2 = new CreateOwnerOptions()
+            {
+                FirstName = $"Dimitris{DateTime.Now.Second}",
+                LastName = "Stavridis",
+                Email = $"stavriddim{ran}@gmail.com",
+                Age = 80
+            };
 
-            Assert.NotNull(search);
-            Assert.Equal(option.FirstName, owner.FirstName);
-            Assert.Equal(option.LastName, owner.LastName);
-            Assert.Equal(option.Email, owner.Email);
+            var owner2 = await osvc_.CreateOwnerAsync(option2);
+
+            Assert.Null(owner2.Data);
         }
 
         [Fact]
-        public void CreateOwnerFail_Age()
+        public async Task CreateOwnerFail_AgeAsync()
         {
             var option = new CreateOwnerOptions()
             {
@@ -84,38 +90,50 @@ namespace Crowdfund.Test {
                 Age = 10
             };
 
-            var owner = osvc_.CreateOwner(option);
+            var owner = await osvc_.CreateOwnerAsync(option);
 
             Assert.NotNull(owner);
         }
 
         [Fact]
-        public void SearchOwnerById_Success()
+        public async Task SearchOwnerById_SuccessAsync()
         {
-            var search = osvc_.SearchOwner(
+            var search = await osvc_.SearchOwner(
                 new SearchOwnerOptions()
                 {
-                    Email = "stavriddim@gmail.com"
+                    Email = "stavriddim28@gmail.com"
                 }
-                ).SingleOrDefault();
+                ).SingleOrDefaultAsync();
 
             Assert.NotNull(search);
 
-            var idSearch = osvc_.SearchOwnerById(search.Id);
-            Assert.Equal(search.Email, idSearch.Email);
+            var idSearch = await osvc_.SearchOwnerByIdAsync(search.Id);
+            Assert.Equal(search.Email, idSearch.Data.Email);
         }
 
         [Fact]
-        public void UpdateOwner_Success()
+        public async Task UpdateOwner_SuccessAsync()
         {
             var option = new UpdateOwnerOptions()
             {
-                FirstName = $"Dimitris{DateTime.Now.Second}",                             
+                FirstName = $"Dimitris77777",                             
             };
 
-            var isUpdated = osvc_.UpdateOwner(3, option);
+            var isUpdated = await osvc_.UpdateOwnerAsync(2, option);
 
-            Assert.True(isUpdated);
+            Assert.Equal(option.FirstName, isUpdated.Data.FirstName);
+        }
+
+        [Fact]
+        public async Task IsOwnerAlloedToSee()
+        {
+
+            var project = await psvc_.SearchProjectByIdAsync(1);
+            var IsAllowed = await osvc_.IsOwnerAllowedToSeeAsync(1,project.Data);
+
+            Assert.True(IsAllowed);
+
+
         }
     }
 }

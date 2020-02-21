@@ -33,6 +33,8 @@ namespace Crowdfund.Core.Model {
         public ICollection<BuyerReward> Buyers { get; set; }
 
 
+        public int ProjectId { get; set; }
+
         public Reward()
         {
             Buyers = new List<BuyerReward>();

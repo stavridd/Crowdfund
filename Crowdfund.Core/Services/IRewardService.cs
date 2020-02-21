@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 
 namespace Crowdfund.Core.Services {
     public interface IRewardService 
     {
-        Reward CreateReward(int ownerId,
-            Model.Options.CreateRewardOptions options);
+        Task<ApiResult<Reward>> CreateRewardAsync(int ownerId,
+            int projectId, Model.Options.CreateRewardOptions options);
 
-        Reward SearchRewardById(int rewardId);
+        Task<ApiResult<Reward>> SearchRewardByIdAsync(int rewardId);
     }
 }

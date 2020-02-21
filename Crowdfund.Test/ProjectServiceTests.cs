@@ -6,6 +6,8 @@ using Autofac;
 
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Test {
     public partial class ProjectServiceTests : IClassFixture<CrowdfundFixture>
@@ -19,7 +21,7 @@ namespace Crowdfund.Test {
 
 
         [Fact]
-        public void CreateProjectSuccess()
+        public async Task CreateProjectSuccess()
         {
             var option = new CreateProjectOptions()
             {
@@ -29,13 +31,13 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project = psvc_.CreateProject(2,option);
+            var project = await psvc_.CreateProjectAsync(1,option);
 
             Assert.NotNull(project);
         }
 
         [Fact]
-        public void CreateProjectFail_SameTitle()
+        public async Task CreateProjectFail_SameTitle()
         {
             var option = new CreateProjectOptions()
             {
@@ -44,13 +46,13 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project = psvc_.CreateProject(2, option);
+            var project = await psvc_.CreateProjectAsync(1, option);
 
             Assert.NotNull(project);
         }
 
         [Fact]
-        public void SearchProjectSuccess()
+        public async Task SearchProjectSuccess()
         {
             var rand = DateTime.Now.Second;
 
@@ -61,25 +63,26 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project = psvc_.CreateProject(3, option);
+            var project =  await psvc_.CreateProjectAsync(2, option);
 
             var search = new SearchProjectOptions()
             {
                 Title = $"This is a Test Project {rand}",
             };
 
-            var pr = psvc_.SearchProject(search);
+            var pr =  psvc_.SearchProject(search);
+            var retreiveProject =await pr.ToListAsync();
 
-            Assert.NotNull(pr);
-            Assert.Contains($"This is a Test Project {rand}",
-                     $"This is a Test Project {rand}");
+            Assert.NotNull(retreiveProject);
+            //Assert.Contains($"This is a Test Project {rand}",
+            //         $"This is a Test Project {rand}");
         }
 
         [Fact]
         public void SearchProjectByIdSuccess()
         {
             
-            var pr = psvc_.SearchProjectByCstegory(
+            var pr =  psvc_.SearchProjectByCstegory( 
                  Core.Model.ProjectCategory.DesignAndTech);
 
             Assert.NotNull(pr);
@@ -87,32 +90,38 @@ namespace Crowdfund.Test {
         }
 
         [Fact]
-        public void ChangeProjectStatusSuccess()
+        public async Task ChangeProjectStatusSuccessAsync()
         {
 
-            var pr = psvc_.ChangeProjectStatus(1,
+            var pr = await psvc_.ChangeProjectStatusAsync(3,
                 Core.Model.ProjectStatus.Completed);
             
             Assert.True(pr);
 
-            var result = psvc_.SearchProjectById(1);
+            var result = await psvc_.SearchProjectByIdAsync(3);
 
-            var stat = result.Status.ToString();
+            var stat = result.Data.Status.ToString();
 
-            Assert.Matches("Completed", stat);   
+            Assert.Equal("Completed", stat);   
         }
 
         [Fact]
-        public void GetProjectIdSuccess()
+        public async Task GetProjectIdSuccessAsync()
         {
 
-            var title = "This is a Test Project 29";
+            var title = "This is a Test Project 41";
             var Desc = "This is the first test project";
 
-            var Id = psvc_.GetProjectId(title, Desc);
+            var Id = await psvc_.GetProjectIdAsync(title, Desc);
 
-            Assert.Equal(4, Id);
+            Assert.Equal(1, Id);
+        }
 
+        [Fact]
+        public async Task BuyProject_Success()
+        {
+            var success = await psvc_.BuyProjectAsync(5, 8, 3);
+            Assert.True(success);
         }
     }
 }
