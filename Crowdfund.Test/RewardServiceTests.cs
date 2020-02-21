@@ -32,7 +32,7 @@ namespace Crowdfund.Test {
                 Value =  775.72M
             };
 
-            var reward = await rsvc_.CreateRewardAsync(1,option);
+            var reward = await rsvc_.CreateRewardAsync(1,1,option);
             var owner = await osvc_.SearchOwnerByIdAsync(1);
 
             var exist = owner.Data.Rewards.Contains(reward.Data);

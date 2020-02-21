@@ -12,14 +12,15 @@ namespace Crowdfund.Core.Services {
         private readonly Data.CrowdfundDbContext context_;
         private readonly IOwnerService owners_;
         private readonly IRewardService rewards_;
+        private readonly IOwnerService owner;
 
         public ProjectService(Data.CrowdfundDbContext context,
-                  IOwnerService owners, IRewardService reward)
+                  IRewardService reward, IOwnerService owner)
         {
             context_ = context ??
                 throw new ArgumentException(nameof(context));
-            owners_ = owners;
             rewards_ = reward;
+            owners_ = owner;
         }
 
         public async Task <ApiResult<Project>> CreateProjectAsync(int ownerId,
@@ -28,6 +29,11 @@ namespace Crowdfund.Core.Services {
             if (options == null) {
                 return new ApiResult<Project>(
                      StatusCode.BadRequest, "Null options");
+            }
+
+            if (ownerId == 0) {
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, "Null Project Creator's Id");
             }
 
             if (string.IsNullOrWhiteSpace(options.Title) ||
@@ -67,7 +73,7 @@ namespace Crowdfund.Core.Services {
 
 
 
-            owner.Data.Projects.Add(project);
+           owner.Data.Projects.Add(project);
 
            await context_.AddAsync(project);
             try {
@@ -137,7 +143,8 @@ namespace Crowdfund.Core.Services {
             }
 
             project.Data.Status = Status;
- 
+           
+
             var success = false;
             try {
                 success = await context_.SaveChangesAsync() > 0;
@@ -176,13 +183,15 @@ namespace Crowdfund.Core.Services {
                 return false;
             }
 
+            if (project.Data.Status != ProjectStatus.Active) {
+                return false;
+            }
             project.Data.Buyers.Add(
                 new ProjectBuyer()
                 {
                     ProjectId = project.Data.Id,
                     BuyerId = buyerId
                 });
-
 
             //Must change Below
 
@@ -198,7 +207,20 @@ namespace Crowdfund.Core.Services {
                     RewardId = rewardId,
                     BuyerId = buyerId
                 });
-            
+
+            project.Data.Contributions = project.Data.Contributions + reward.Data.Value;
+
+            if(project.Data.Contributions > project.Data.Goal) {
+                project.Data.Status = ProjectStatus.Completed;
+            }
+
+            try {
+                await context_.SaveChangesAsync();
+            } catch (Exception ex) {
+
+                return false;
+            }
+
             return true;
 
         }
@@ -231,5 +253,7 @@ namespace Crowdfund.Core.Services {
                 return pr.Id;
             }
         }
+
+
     }
 }

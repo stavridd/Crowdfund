@@ -4,14 +4,16 @@ using Crowdfund.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crowdfund.Core.Migrations
 {
     [DbContext(typeof(CrowdfundDbContext))]
-    partial class CrowdfundDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200221073924_add_projectid")]
+    partial class add_projectid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,7 +140,7 @@ namespace Crowdfund.Core.Migrations
                     b.Property<int>("NumberOfContributions")
                         .HasColumnType("int");
 
-                    b.Property<int>("OwnerId")
+                    b.Property<int?>("OwnerId")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
@@ -250,9 +252,7 @@ namespace Crowdfund.Core.Migrations
                 {
                     b.HasOne("Crowdfund.Core.Model.Owner", "Owner")
                         .WithMany("Projects")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OwnerId");
                 });
 
             modelBuilder.Entity("Crowdfund.Core.Model.ProjectBuyer", b =>

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 
@@ -17,5 +18,9 @@ namespace Crowdfund.Core.Services {
             Model.Options.UpdateOwnerOptions options);
 
         Task<bool> AddRewardAsync(int ownerId, Reward reward);
+
+        Task<ApiResult<ICollection<Project>>> GetMyProjectsAsync(int ownerId);
+
+        Task<bool> IsOwnerAllowedToSeeAsync(int ownerId, Project projectId);
     }
 }

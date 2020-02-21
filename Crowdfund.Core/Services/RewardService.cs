@@ -23,10 +23,11 @@ namespace Crowdfund.Core.Services {
         }
 
        public async Task<ApiResult<Reward>> CreateRewardAsync(int ownerId,
-            Model.Options.CreateRewardOptions options)
+            int projectId, Model.Options.CreateRewardOptions options)
         {
             if (ownerId <= 0 ||
-              options == null) {
+              options == null ||
+              projectId <= 0 ) {
                 return new ApiResult<Reward>(
                     StatusCode.BadRequest, "Null options");
             }
@@ -51,7 +52,8 @@ namespace Crowdfund.Core.Services {
                 Owner = owner.Data,
                 Title = options.Title,
                 Description = options.Description,
-                Value = options.Value   
+                Value = options.Value,
+                ProjectId = projectId
             };
 
             var result = await owners_.AddRewardAsync(ownerId, reward);

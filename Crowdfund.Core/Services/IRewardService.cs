@@ -8,7 +8,7 @@ namespace Crowdfund.Core.Services {
     public interface IRewardService 
     {
         Task<ApiResult<Reward>> CreateRewardAsync(int ownerId,
-            Model.Options.CreateRewardOptions options);
+            int projectId, Model.Options.CreateRewardOptions options);
 
         Task<ApiResult<Reward>> SearchRewardByIdAsync(int rewardId);
     }

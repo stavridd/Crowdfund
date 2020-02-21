@@ -7,6 +7,7 @@ using Autofac;
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Test {
     public partial class ProjectServiceTests : IClassFixture<CrowdfundFixture>
@@ -62,7 +63,7 @@ namespace Crowdfund.Test {
                 projectcategory = Core.Model.ProjectCategory.DesignAndTech
             };
 
-            var project =  await psvc_.CreateProjectAsync(1, option);
+            var project =  await psvc_.CreateProjectAsync(2, option);
 
             var search = new SearchProjectOptions()
             {
@@ -70,10 +71,11 @@ namespace Crowdfund.Test {
             };
 
             var pr =  psvc_.SearchProject(search);
+            var retreiveProject =await pr.ToListAsync();
 
-            Assert.NotNull(pr);
-            Assert.Contains($"This is a Test Project {rand}",
-                     $"This is a Test Project {rand}");
+            Assert.NotNull(retreiveProject);
+            //Assert.Contains($"This is a Test Project {rand}",
+            //         $"This is a Test Project {rand}");
         }
 
         [Fact]
@@ -100,7 +102,7 @@ namespace Crowdfund.Test {
 
             var stat = result.Data.Status.ToString();
 
-            Assert.Matches("Completed", stat);   
+            Assert.Equal("Completed", stat);   
         }
 
         [Fact]
@@ -113,7 +115,13 @@ namespace Crowdfund.Test {
             var Id = await psvc_.GetProjectIdAsync(title, Desc);
 
             Assert.Equal(1, Id);
+        }
 
+        [Fact]
+        public async Task BuyProject_Success()
+        {
+            var success = await psvc_.BuyProjectAsync(5, 8, 3);
+            Assert.True(success);
         }
     }
 }

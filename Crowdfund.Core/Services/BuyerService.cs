@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Crowdfund.Core.Model;
@@ -9,11 +10,14 @@ namespace Crowdfund.Core.Services {
     public class BuyerService : IBuyerService 
     {
         private readonly Data.CrowdfundDbContext context_;
+        private readonly IProjectService projects_;
 
-        public BuyerService(Data.CrowdfundDbContext context)
+        public BuyerService(Data.CrowdfundDbContext context,
+            IProjectService projects)
         {
             context_ = context ??
                 throw new ArgumentException(nameof(context));
+            projects_ = projects;
         }
 
         public async Task<ApiResult<Buyer>> CreateBuyerAsync(
@@ -152,6 +156,95 @@ namespace Crowdfund.Core.Services {
 
             }
             return ApiResult<Buyer>.CreateSuccess(buyer.Data);
+        }
+
+        public async Task<ApiResult<ICollection<Project>>> GetMyProjectsAsync(
+                    int buyerId)
+        {
+            var buyer = await SearchBuyerByIdAsync(buyerId);
+
+            if (buyer == null) {
+                return new ApiResult<ICollection<Project>>(
+                    StatusCode.BadRequest, "Invalid Id");
+            }
+
+            var buyerProjects = buyer.Data.Projects;
+
+            ICollection<Project> projectList;
+            projectList = new List<Project>();
+
+            foreach(var p in buyerProjects) {
+
+                var project = await projects_.SearchProjectByIdAsync(p.ProjectId);
+                 projectList.Add(project.Data);
+            }
+
+            if (projectList.Count == 0) {
+                return new ApiResult<ICollection<Project>>(
+                    StatusCode.BadRequest, "No projects are available");
+            }
+            return ApiResult<ICollection<Project>>.CreateSuccess(projectList);
+        }
+
+
+        public async Task<ApiResult<ICollection<Project>>> GetMyCompletedProjectsAsync(int buyerId)
+        {
+            var buyer = await SearchBuyerByIdAsync(buyerId);
+
+            if (buyer == null) {
+                return new ApiResult<ICollection<Project>>(
+                    StatusCode.BadRequest, "Invalid Id");
+            }
+
+            var buyerProjects = buyer.Data.Projects;
+
+            ICollection<Project> projectList;
+            projectList = new List<Project>();
+
+            foreach (var p in buyerProjects) {
+
+                var project = await projects_.SearchProjectByIdAsync(p.ProjectId);
+
+                if (project.Data.Status == ProjectStatus.Completed) {
+                    projectList.Add(project.Data);
+                }
+            }
+
+            if (projectList.Count == 0) {
+                return new ApiResult<ICollection<Project>>(
+                    StatusCode.BadRequest, "No projects are available");
+            }
+            return ApiResult<ICollection<Project>>.CreateSuccess(projectList);
+
+        }
+
+        public async Task<bool> IsBuyerAllowedToSee(int buyerId, int projectId)
+        {
+            if (buyerId <= 0) {
+                return false;
+            }
+            if (projectId <= 0) {
+                return false;
+            }
+            var buyer = await SearchBuyerByIdAsync(buyerId);
+            if (buyer == null) {
+                return false;
+            }
+            var project = await projects_.SearchProjectByIdAsync(projectId);
+            if (project == null) {
+                return false;
+            }
+
+            var exists = await context_
+                .Set<ProjectBuyer>()
+                .SingleOrDefaultAsync(
+                s => s.BuyerId == buyerId &&
+                s.ProjectId == projectId);
+
+            if (exists == null) {
+                return false;
+            }
+            return true;
         }
     }
 }

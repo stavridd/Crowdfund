@@ -1,16 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 using Crowdfund.Core.Model.Options;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Crowdfund.Core.Services {
     public class OwnerService : IOwnerService 
     {
         private readonly Data.CrowdfundDbContext context_;
+        //private readonly IProjectService projects_;
 
         public OwnerService(Data.CrowdfundDbContext context)
+      //      IProjectService projects)
         {
             context_ = context ??
                 throw new ArgumentException(nameof(context));
@@ -163,6 +167,46 @@ namespace Crowdfund.Core.Services {
             var owner = await SearchOwnerByIdAsync(ownerId);
             owner.Data.Rewards.Add(reward);
             return true; 
+        }
+
+       public async Task<ApiResult<ICollection<Project>>> GetMyProjectsAsync(int ownerId)
+       {
+            var owner = await SearchOwnerByIdAsync(ownerId);
+
+            if (owner == null) {
+                return new ApiResult<ICollection<Project>>(StatusCode.BadRequest, "Invalid Id");
+            }
+            return ApiResult<ICollection<Project>>.CreateSuccess(owner.Data.Projects);
+    
+       }
+
+        public async Task<bool> IsOwnerAllowedToSeeAsync(int ownerId, Project project)
+        {
+            if (ownerId <= 0) {
+                return false;
+            }
+            if (project == null) {
+                return false;
+            }
+            var owner = await SearchOwnerByIdAsync(ownerId);
+            if (owner == null) {
+                return false;
+            }
+
+            if (project.OwnerId == ownerId) {
+                return true;
+            }
+           
+            //foreach(var p in owner.Data.Projects) {
+            //    if (p.Id != projectId) {
+            //        continue;
+            //    }
+            //    else {
+            //        return true;
+            //    }
+            //}
+
+            return false;
         }
     }
 }

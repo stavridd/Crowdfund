@@ -1,4 +1,6 @@
-﻿namespace Crowdfund.Core {
+﻿using System.Collections.Generic;
+
+namespace Crowdfund.Core {
     public class ApiResult<T>
     {
         public StatusCode ErrorCode { get; set; }
@@ -35,5 +37,6 @@
                 ErrorCode = StatusCode.Ok
             };
         }
+
     }
 }

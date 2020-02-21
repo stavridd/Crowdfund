@@ -13,10 +13,12 @@ namespace Crowdfund.Test {
     public partial class OwnerServiceTests
                     : IClassFixture<CrowdfundFixture> {
         private readonly IOwnerService osvc_;
+        private readonly IProjectService psvc_;
 
         public OwnerServiceTests(CrowdfundFixture fixture)
         {
             osvc_ = fixture.Container.Resolve<IOwnerService>();
+            psvc_ = fixture.Container.Resolve<IProjectService>();
         }
 
         [Fact]
@@ -114,12 +116,24 @@ namespace Crowdfund.Test {
         {
             var option = new UpdateOwnerOptions()
             {
-                FirstName = $"Dimitris88888",                             
+                FirstName = $"Dimitris77777",                             
             };
 
             var isUpdated = await osvc_.UpdateOwnerAsync(2, option);
 
             Assert.Equal(option.FirstName, isUpdated.Data.FirstName);
+        }
+
+        [Fact]
+        public async Task IsOwnerAlloedToSee()
+        {
+
+            var project = await psvc_.SearchProjectByIdAsync(1);
+            var IsAllowed = await osvc_.IsOwnerAllowedToSeeAsync(1,project.Data);
+
+            Assert.True(IsAllowed);
+
+
         }
     }
 }
