@@ -19,4 +19,17 @@
 		<Watch Include="**\*.js" Exclude="node_modules\**\*;**\*.js.map;obj\**\*;bin\**\*" />
 		<Watch Include="**\*.cshtml" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Watch Remove="Views\Owner\Create.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Views\Buyer\Create.cshtml" />
+	  <None Include="Views\Buyer\Index.cshtml" />
+	  <None Include="Views\Owner\Create.cshtml" />
+	  <None Include="Views\Owner\Index.cshtml" />
+	  <None Include="Views\Project\Create.cshtml" />
+	  <None Include="Views\Project\Index.cshtml" />
+	</ItemGroup>
 </Project>

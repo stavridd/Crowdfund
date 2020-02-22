@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 
 namespace Crowdfund.Web.Models {
-    public class ProjectsViewModel         
-    {
+    public class ProjectsViewModel {
+
         public List<Project> Projects { get; set; }
     }
 }

@@ -1,0 +1,37 @@
+﻿@model Crowdfund.Core.Model.Options.CreateBuyerOptions
+
+<form method="post" action="@Url.Action("CreateBuyer", "Buyer")">
+
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(b => b.FirstName)">First Name</label>
+            @Html.TextBoxFor(b => b.FirstName,
+                new { @class = "form-control ", placeholder = "enter your first name" })
+        </div>
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(b => b.LastName)">Last Name</label>
+            @Html.TextBoxFor(b => b.LastName,
+                new { @class = "form-control ", placeholder = "enter your last name" })
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="@Html.IdFor(b => b.Email)"> Email</label>
+                @Html.TextBoxFor(b => b.Email,
+                    new { @class = "form-control  ", placeholder = "enter your email" })
+            </div>
+            <div class="form-group col-md-4">
+                <label for="@Html.IdFor(b => b.Age)">Age</label>
+                @Html.TextBoxFor(b => b.Age,
+                    new { @class = "form-control ", placeholder = "enter your age" })
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-8">
+            <label for="@Html.IdFor(b => b.Photo)"> Photo</label>
+            @Html.TextBoxFor(b => b.Photo,
+                new { @class = "form-control ", placeholder = "enter photo url" })
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary js-submit-buyer">Submit</button>
+</form>
