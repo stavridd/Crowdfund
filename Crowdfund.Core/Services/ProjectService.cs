@@ -287,6 +287,7 @@ namespace Crowdfund.Core.Services {
             {
                 id = projectId,
                 statusUpdate = update,
+                DatePost = DateTimeOffset.Now
             };
 
             await context_.AddAsync(statusUpdate);
