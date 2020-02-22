@@ -12,15 +12,17 @@ namespace Crowdfund.Core.Services {
         private readonly Data.CrowdfundDbContext context_;
         private readonly IOwnerService owners_;
         private readonly IRewardService rewards_;
-        private readonly IOwnerService owner;
+        private readonly ILoggerService logger_;
 
         public ProjectService(Data.CrowdfundDbContext context,
-                  IRewardService reward, IOwnerService owner)
+                  IRewardService reward, IOwnerService owner,
+                  ILoggerService logger)
         {
             context_ = context ??
                 throw new ArgumentException(nameof(context));
             rewards_ = reward;
             owners_ = owner;
+            logger_ = logger;
         }
 
         public async Task <ApiResult<Project>> CreateProjectAsync(int ownerId,
@@ -78,10 +80,14 @@ namespace Crowdfund.Core.Services {
            await context_.AddAsync(project);
             try {
                 await context_.SaveChangesAsync();
-            } catch (Exception ex) {
+            } catch {
 
-                return new ApiResult<Project>(
-                      StatusCode.InternalServerError, "Project Was Not Added");
+                logger_.LogError(StatusCode.InternalServerError,
+                       $"Error Save Project: {project.Title}");
+
+                return new ApiResult<Project>
+                     (StatusCode.InternalServerError,
+                       "Error Save Project");
             }
 
             return ApiResult<Project>.CreateSuccess(project);
@@ -148,8 +154,11 @@ namespace Crowdfund.Core.Services {
             var success = false;
             try {
                 success = await context_.SaveChangesAsync() > 0;
-            } catch (Exception ex) {
+            } catch {
+                logger_.LogError(StatusCode.InternalServerError,
+                     $"Error Save Project: {project.Data.Title}");
 
+                return false;
             }
             return success;
         }
@@ -216,8 +225,12 @@ namespace Crowdfund.Core.Services {
 
             try {
                 await context_.SaveChangesAsync();
-            } catch (Exception ex) {
+            } catch {
 
+                logger_.LogError(StatusCode.InternalServerError,
+                     $"Error Search Project: {project.Data.Title}");
+
+                
                 return false;
             }
 
@@ -254,6 +267,67 @@ namespace Crowdfund.Core.Services {
             }
         }
 
+        public async Task<bool> AddStatusUpdateAsync(int projectId, string update)
+        {
+            if (string.IsNullOrWhiteSpace(update)) {
+                return false;
+            }
 
+            if (projectId <=0) {
+                return false;
+            }
+
+            var project = await SearchProjectByIdAsync(projectId);
+
+            if (project.Data == null) {
+                return false;
+            }
+
+            var statusUpdate = new StatusUpdates()
+            {
+                id = projectId,
+                statusUpdate = update,
+            };
+
+            await context_.AddAsync(statusUpdate);
+
+            var success = false;
+            try {
+                success = await context_.SaveChangesAsync() > 0;
+            } catch{
+                logger_.LogError(StatusCode.InternalServerError,
+                   $"Error Adding status update of a project: {project.Data.Title}");
+
+                return false;
+            }
+            return success;
+
+        }
+
+        public async Task<ApiResult<List<StatusUpdates>>> GetStatusUpdateAsync(int projectId)
+        {
+            if (projectId <= 0) {
+                return new ApiResult<List<StatusUpdates>> (
+                     StatusCode.BadRequest, "Null project id");
+            }
+
+            var project = await SearchProjectByIdAsync(projectId);
+
+            if (project.Data == null) {
+                return new ApiResult<List<StatusUpdates>>(
+                     StatusCode.NotFound, "No such project");
+            }
+
+            var query = context_
+                .Set<StatusUpdates>()
+                .AsQueryable();
+
+            var statusUp = await query
+                .Where(u => u.id == projectId)
+                .ToListAsync();
+
+            return ApiResult<List<StatusUpdates>>.CreateSuccess(statusUp);
+
+        }
     }
 }

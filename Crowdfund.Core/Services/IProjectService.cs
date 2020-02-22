@@ -26,5 +26,9 @@ namespace Crowdfund.Core.Services {
         Task<bool> BuyProjectAsync(int projectId, int buyerId, int rewardId);
         
          Task<int> GetProjectIdAsync(string title, string Desc);
+
+        Task<bool> AddStatusUpdateAsync(int projectId, string update);
+
+        Task<ApiResult<List<StatusUpdates>>> GetStatusUpdateAsync(int projectId);
     }
 }

@@ -49,6 +49,11 @@ namespace Crowdfund.Core {
                 .RegisterType<Data.CrowdfundDbContext>()
                 .InstancePerLifetimeScope()
                 .AsSelf();
+
+            builder
+                .RegisterType<LoggerService>()
+                .InstancePerLifetimeScope()
+                .As<ILoggerService>();
         }
     }
 }

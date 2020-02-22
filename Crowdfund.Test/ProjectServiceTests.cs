@@ -123,5 +123,20 @@ namespace Crowdfund.Test {
             var success = await psvc_.BuyProjectAsync(5, 8, 3);
             Assert.True(success);
         }
+
+        [Fact]
+        public async Task AddStatusUpdate_Success()
+        {
+            var update = $"This is a status Uppdate {DateTime.Now.Second}";
+
+            //var isPosted = await psvc_.AddStatusUpdateAsync(3, update);
+
+           // Assert.True(isPosted);
+
+            var stats = await psvc_.GetStatusUpdateAsync(3);
+
+            //Assert.Equal(isPosted, stats.Data);
+
+        }
     }
 }
