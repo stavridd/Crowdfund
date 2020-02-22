@@ -5,12 +5,12 @@ namespace Crowdfund.Core.Model {
     {
         public int id { get; set; }
 
-        //public int projectId { get; set; }
+        public int projectId { get; set; }
 
         public string statusUpdate { get; set; }
 
         public DateTimeOffset DatePost { get; set; }
 
-        Project project { get; set; }
+        public Project project { get; set; }
     }
 }

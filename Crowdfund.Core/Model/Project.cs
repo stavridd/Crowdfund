@@ -25,7 +25,7 @@ namespace Crowdfund.Core.Model {
         /// <summary>
         /// A list of status updates of the project 
         /// </summary>
-        public List<StatusUpdates> Updates { get; set; }
+        public ICollection<StatusUpdates> Updates { get; set; }
 
         /// <summary>
         /// The category of the project 

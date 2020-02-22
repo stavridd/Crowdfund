@@ -129,9 +129,9 @@ namespace Crowdfund.Test {
         {
             var update = $"This is a status Uppdate {DateTime.Now.Second}";
 
-            //var isPosted = await psvc_.AddStatusUpdateAsync(3, update);
+            var isPosted = await psvc_.AddStatusUpdateAsync(3, update);
 
-           // Assert.True(isPosted);
+            Assert.True(isPosted);
 
             var stats = await psvc_.GetStatusUpdateAsync(3);
 
