@@ -45,6 +45,7 @@ $('.js-submit-owner').on('click', () => {
     let age = $('.js-age').val();
 
     let data = JSON.stringify({
+
         
 
         firstname: firstname,
@@ -54,7 +55,7 @@ $('.js-submit-owner').on('click', () => {
     });
 
     $.ajax({
-        url: '/Owner/Create',
+        url: '/Owner/CreateOwner',
         type: 'POST',
         contentType: 'application/json',
         data: data
