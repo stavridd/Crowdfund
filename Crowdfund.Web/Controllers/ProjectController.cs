@@ -27,10 +27,10 @@ namespace Crowdfund.Web.Controllers
         }
 
         //[HttpPost]
-        //public IActionResult Create(int id,
+        //public async Task <IActionResult> Create(
         //   Models.CreateProjectViewModel model) {
 
-        //    var result = projects_.CreateProjectAsync(id,
+        //    var result = await projects_.CreateProjectAsync(model.OwnerId,
         //        model?.CreateOptions);
 
         //    if (result == null) {

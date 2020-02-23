@@ -25,10 +25,10 @@ namespace Crowdfund.Web.Controllers {
         }
 
         //[HttpPost]
-        //public IActionResult Create(
+        //public async Task<IActionResult> Create(
         //      Models.CreateBuyerViewModel model) {
 
-        //    var result = buyers_.CreateBuyerAsync(
+        //    var result = await buyers_.CreateBuyerAsync(
         //        model?.CreateOptions);
 
         //    if (result == null) {

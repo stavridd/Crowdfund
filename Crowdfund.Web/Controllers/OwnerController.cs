@@ -28,30 +28,31 @@ namespace Crowdfund.Web.Controllers {
             return View();
         }
 
-        [HttpPost]
-        public IActionResult Create(
-           Models.CreateOwnerViewModel model) {
-
-            var result = owners_.CreateOwnerAsync(
-                model?.CreateOptions);
-
-            if (result == null) {
-                model.ErrorText = "Oops. Something went wrong";
-
-                return View(model);
-            }
-
-            return Ok();
-        }
-
-
         //[HttpPost]
-        //public async Task<IActionResult> CreateOwner(
-        //   [FromBody] Core.Model.Options.CreateOwnerOptions options) {
-        //    var result = await owners_.CreateOwnerAsync(options);
+        //public async Task<IActionResult> Create(
+        //   Models.CreateOwnerViewModel model) {
 
-        //    return result.AsStatusResult();
+        //    var result = await owners_.CreateOwnerAsync(
+        //        model?.CreateOptions);
+
+        //    if (result == null) {
+        //        model.ErrorText = "Oops. Something went wrong";
+
+        //        return View(model);
+        //    }
+
+        //    return Ok();
         //}
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateOwner(
+           [FromBody] Core.Model.Options.CreateOwnerOptions options) {
+
+            var result = await owners_.CreateOwnerAsync(options);
+
+            return result.AsStatusResult();
+        }
     }
 }
 

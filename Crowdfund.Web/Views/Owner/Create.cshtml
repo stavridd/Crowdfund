@@ -1,37 +1,50 @@
-﻿@model Crowdfund.Web.Models.CreateBuyerViewModel
+﻿@model Crowdfund.Core.Model.Options.CreateOwnerOptions
 
-    <form method="post" action="@Url.Action("Create", "Owner")">
+
+<form class="js-create-owner" method="post"
+      action="@Url.Action("CreateOwner", "Owner")">
+
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(o => o.FirstName)">First Name</label>
+            @Html.TextBoxFor(o => o.FirstName,
+                new { @class = "form-control js-firstname ", placeholder = "enter your first name" })
+        </div>
+
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(o => o.LastName)">Last Name</label>
+            @Html.TextBoxFor(o => o.LastName,
+                new { @class = "form-control js-lastname", placeholder = "enter your last name" })
+        </div>
 
         <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="@Html.IdFor(o => o.CreateOptions.FirstName)">First Name</label>
-                @Html.TextBoxFor(o => o.CreateOptions.FirstName,
-                    new { @class = "form-control js-firstname ", placeholder = "enter your first name" })
+            <div class="form-group col-md-6">
+                <label for="@Html.IdFor(o => o.Email)"> Email</label>
+                @Html.TextBoxFor(o => o.Email,
+                    new { @class = "form-control js-email ", placeholder = "enter your email" })
             </div>
+
             <div class="form-group col-md-4">
-                <label for="@Html.IdFor(o => o.CreateOptions.LastName)">Last Name</label>
-                @Html.TextBoxFor(o => o.CreateOptions.LastName,
-                    new { @class = "form-control js-lastname", placeholder = "enter your last name" })
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="@Html.IdFor(o => o.CreateOptions.Email)"> Email</label>
-                    @Html.TextBoxFor(o => o.CreateOptions.Email,
-                        new { @class = "form-control js-email ", placeholder = "enter your email" })
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="@Html.IdFor(o => o.CreateOptions.Age)">Age</label>
-                    @Html.TextBoxFor(o => o.CreateOptions.Age,
-                        new { @class = "form-control js-age ", placeholder = "enter your age" })
-                </div>
+                <label for="@Html.IdFor(o => o.Age)">Age</label>
+                @Html.TextBoxFor(o => o.Age,
+                    new { @class = "form-control js-age ", placeholder = "enter your age" })
             </div>
         </div>
-        @*<div class="form-row">
+    </div>
+    @*<div class="form-row">
             <div class="form-group col-md-8">
                 <label for="@Html.IdFor(o => o.Photo)"> Photo</label>
                 @Html.TextBoxFor(o => o.Photo,
                     new { @class = "form-control ", placeholder = "enter photo url" })
             </div>
         </div>*@
-        <button type="submit" class="btn btn-primary js-submit-owner">Submit</button>       
-    </form>
+    <button type="button" class="btn btn-primary js-submit-owner">Submit</button>
+</form>
+
+@*<div class="alert alert-danger js-create-owner-alert" role="alert"
+     style="display: none">
+</div>
+
+<div class="alert alert-success js-create-owner-success" role="alert"
+     style="display: none">
+</div>*@
