@@ -39,7 +39,8 @@ namespace Crowdfund.Core.Services {
             }
 
             if (string.IsNullOrWhiteSpace(options.Title) ||
-              string.IsNullOrWhiteSpace(options.Description)) {
+              string.IsNullOrWhiteSpace(options.Description))
+              {
                 return new ApiResult<Project>(
                      StatusCode.BadRequest, "Null Title or Description");
             }
@@ -48,6 +49,11 @@ namespace Crowdfund.Core.Services {
             {
                 return new ApiResult<Project>(
                      StatusCode.BadRequest, " Project Category is Invlaid");
+            }
+
+            if (options.Goal <= 0) {
+                return new ApiResult<Project>(
+                     StatusCode.BadRequest, " Financial Goal Must Be Greater than 0");
             }
 
             var owner = await owners_.SearchOwnerByIdAsync(ownerId);
@@ -70,6 +76,7 @@ namespace Crowdfund.Core.Services {
                 Title = options.Title,
                 Description = options.Description,
                 projectcategory = options.projectcategory,
+                Goal = options.Goal,
                 Owner = owner.Data
             };
 
@@ -106,7 +113,7 @@ namespace Crowdfund.Core.Services {
 
             if (!string.IsNullOrWhiteSpace(options.Title)) {
                 query = query.Where(c =>
-                    c.Title == options.Title);
+                    c.Title.Contains(options.Title));
             }
 
             if (options.projectcategory != null) {
@@ -329,6 +336,105 @@ namespace Crowdfund.Core.Services {
 
             return ApiResult<List<StatusUpdates>>.CreateSuccess(statusUp);
 
+        }
+
+        public async Task<ApiResult<List<Multimedia>>> GetProjectPhotoAsync(int projectId) {
+            if (projectId <= 0) {
+                return new ApiResult<List<Multimedia>>(
+                     StatusCode.BadRequest, "Null project id");
+            }
+
+            var project = await SearchProjectByIdAsync(projectId);
+
+            if (project.Data == null) {
+                return new ApiResult<List<Multimedia>>(
+                     StatusCode.NotFound, "No such project");
+            }
+
+            var query = context_
+                .Set<Multimedia>()
+                .AsQueryable();
+
+            var photo = await query
+                .Where(m => m.project == project.Data && m.multimediaCategory == MultimediaCategory.Photo)
+                .ToListAsync();
+
+            return ApiResult<List<Multimedia>>.CreateSuccess(photo);
+        }
+
+        public async Task<ApiResult<List<Multimedia>>> GetProjectVideoAsync(int projectId) {
+            if (projectId <= 0) {
+                return new ApiResult<List<Multimedia>>(
+                     StatusCode.BadRequest, "Null project id");
+            }
+
+            var project = await SearchProjectByIdAsync(projectId);
+
+            if (project.Data == null) {
+                return new ApiResult<List<Multimedia>>(
+                     StatusCode.NotFound, "No such project");
+            }
+
+            var query = context_
+                .Set<Multimedia>()
+                .AsQueryable();
+
+            var statusUp = await query
+                .Where(m => m.project == project.Data &&
+                m.multimediaCategory == MultimediaCategory.Video)
+                .ToListAsync();
+
+            return ApiResult<List<Multimedia>>.CreateSuccess(statusUp);
+        }
+
+        public async Task<ApiResult<Multimedia>> AddMultiAsync(int projectId, string url,
+            MultimediaCategory category) {
+            if (projectId <= 0) {
+                return new ApiResult<Multimedia>(
+                     StatusCode.BadRequest, "Null project id");
+            }
+
+            if (string.IsNullOrWhiteSpace(url)) {
+                return new ApiResult<Multimedia>(
+                     StatusCode.BadRequest, "Null Url");
+            }
+
+            if (category <= 0) {
+                return new ApiResult<Multimedia>(
+                     StatusCode.BadRequest, "Null category");
+            }
+
+            var project = await SearchProjectByIdAsync(projectId);
+
+            if (project.Data == null) {
+                return new ApiResult<Multimedia>(
+                     StatusCode.NotFound, "No such project");
+            }
+
+
+            var multi = new Multimedia() {
+                projectId = project.Data.Id,
+                url = url,
+                multimediaCategory = category,
+                project = project.Data
+            };
+
+
+            await context_.AddAsync(multi);
+            try {
+                await context_.SaveChangesAsync();
+            } catch {
+
+                logger_.LogError(StatusCode.InternalServerError,
+                    $"Error Save Multimedia for project: {project.Data.Title}");
+
+                return new ApiResult<Multimedia>
+                     (StatusCode.InternalServerError,
+                       $"Error Save Multimedia for project: {project.Data.Title}");
+
+            }
+
+            return ApiResult<Multimedia>.CreateSuccess(multi);
         }
     }
 }

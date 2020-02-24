@@ -1,39 +1,4 @@
-﻿//import { Alert } from "../lib/bootstrap/dist/js/bootstrap.bundle";
-
-///-------------------------SEARCH OWNER--------------------------
-$('.js-btn-search').on('click', () => {
-
-    let email = $('.js-email').val();
-    let firstname = $('.js-firstname').val();
-    let lastname = $('.js-lastname').val();
-
-    $.ajax({
-        url: '/Owner/SearchOwner',
-        type: 'GET',
-        data: {
-            email: email,
-            firstname: firstname,
-            lastname: lastname
-        }
-    }).done((owners) => {
-        let ownersList = $('.js-owner-list');
-        ownersList.html('');
-
-        owners.forEach(element => {
-            let listItem =
-                `<tr>
-                    <td>${element.firstname}</td>
-                    <td>${element.lastname}</td>
-                    <td>${element.email}</td>
-                </tr>`;
-
-            ownersList.append(listItem);
-        });
-    }).fail((xhr) => {
-        alert(xhr.responseText);
-    });
-});
-
+﻿
 ///-------------------------CREATE OWNER--------------------------
 $('.js-submit-owner').on('click', () => {
 
@@ -42,7 +7,7 @@ $('.js-submit-owner').on('click', () => {
     let firstname = $('.js-firstname').val();
     let lastname = $('.js-lastname').val();
     let email = $('.js-email').val();
-    let age = $('.js-age').val();
+    let age = parseInt($('.js-age').val());
 
     let data = JSON.stringify({
 
@@ -81,40 +46,6 @@ $('.js-submit-owner').on('click', () => {
     });
 }); 
 
-//-------------------------------SEARCH BUYER-------------------------
-$('.js-btn-search').on('click', () => {
-
-    let email = $('.js-email').val();
-    let firstname = $('.js-firstname').val();
-    let lastname = $('.js-lastname').val();
-
-    $.ajax({
-        url: '/Buyer/SearchBuyer',
-        type: 'GET',
-        data: {
-            email: email,
-            firstname: firstname,
-            lastname: lastname
-        }
-    }).done((buyers) => {
-        let buyersList = $('.js-buyer-list');
-        buyersList.html('');
-
-        buyers.forEach(element => {
-            let listItem =
-                `<tr>
-                    <td>${element.firstname}</td>
-                    <td>${element.lastname}</td>
-                    <td>${element.email}</td>
-                </tr>`;
-
-            buyersList.append(listItem);
-        });
-    }).fail((xhr) => {
-        alert(xhr.responseText);
-    });
-});
-
 //-------------------------------CREATE BUYER-----------------------
 
 $('.js-submit-buyer').on('click', () => {
@@ -124,7 +55,8 @@ $('.js-submit-buyer').on('click', () => {
     let firstname = $('.js-firstname').val();
     let lastname = $('.js-lastname').val();
     let email = $('.js-email').val();
-    let age = $('.js-age').val();
+    let age = parseInt($('.js-age').val());
+    
 
     let data = JSON.stringify({
 
@@ -155,46 +87,39 @@ $('.js-submit-buyer').on('click', () => {
         $alertArea.fadeIn();
 
         setTimeout(function () {
-            $('.js-submit-owner').attr('disabled', false);
+            $('.js-submit-buyer').attr('disabled', false);
         }, 300);
     });
 }); 
 
-//------------------------SEARCH PROJECT----------------------
-$('.js-btn-search').on('click', () => {
-
-    let email = $('.js-email').val();
-    let firstname = $('.js-firstname').val();
-    let lastname = $('.js-lastname').val();
-
-    $.ajax({
-        url: '/Buyer/SearchBuyer',
-        type: 'GET',
-        data: {
-            email: email,
-            firstname: firstname,
-            lastname: lastname
-        }
-    }).done((buyers) => {
-        let buyersList = $('.js-buyer-list');
-        buyersList.html('');
-
-        buyers.forEach(element => {
-            let listItem =
-                `<tr>
-                    <td>${element.firstname}</td>
-                    <td>${element.lastname}</td>
-                    <td>${element.email}</td>
-                </tr>`;
-
-            buyersList.append(listItem);
-        });
-    }).fail((xhr) => {
-        alert(xhr.responseText);
-    });
-});
-
 //------------------------CREATE PROJECT------------------------
+
+let rewards = [];
+
+
+$('.submit-reward').on('click', () => {
+    let $rewardTitle = $('.js-reward-title');
+    let $rewardValue = $('.js-reward-value');
+    let $rewardDescr = $('.js-reward-descrirpion');
+
+    let rewardTitle = $rewardTitle.val();
+    let rewardValue = parseFloat($rewardValue.val());
+    let rewardDescr = $rewardDescr.val();
+
+    if (rewardTitle.length === 0 || rewardValue.length === 0) {
+        return;
+    }
+  
+    rewards.push({
+        title: rewardTitle,
+        value: rewardValue,
+        description: rewardDescr
+    });
+
+    $rewardTitle.val('');
+    $rewardValue.val('');
+    $rewardDescr.val ('');
+});
 
 
 $('.js-submit-project').on('click', () => {
@@ -203,17 +128,25 @@ $('.js-submit-project').on('click', () => {
 
     let title = $('.js-title').val();
     let Description = $('.js-description').val();
+    // let category = ($('.js-category').val());
+    let goal = parseFloat($('.js-goal').val());
     let category = $('.js-category').val();
-    
+    let photo = $('.js-photo').val();
+    debugger;
 
     let data = JSON.stringify({
-
-        firstname: firstname,
-        lastname: lastname,
-        email: email,
-        age: age
+        CreateOptions: {
+            Title: title,
+            Description: Description,
+            projectcategory: parseInt(category),
+            Goal: goal,
+            Multis: photo,
+        },
+        reward: rewards
     });
 
+
+ 
     $.ajax({
         url: '/Project/CreateProject',
         type: 'POST',
@@ -221,9 +154,9 @@ $('.js-submit-project').on('click', () => {
         data: data
     }).done((project) => {
         $('.alert').hide();
-
+        debugger;
         let $alertArea = $('.js-create-project-success');
-        $alertArea.html(`Successfully added customer  `);
+        $alertArea.html(`Successfully added project with id: ${project.id}  `);
         $alertArea.show();
 
         $('form.js-create-project').hide();
@@ -239,3 +172,92 @@ $('.js-submit-project').on('click', () => {
         }, 300);
     });
 }); 
+
+//----------------------Create reward------------------
+
+$('.js-submit-reward').on('click', () => {
+
+$('.js-submit-reward').attr('disabled', true);
+
+let title = $('.js-title').val();
+let description = $('.js-description').val();
+    let value = parseFloat( $('.js-value').val());
+    let projecttitle = $('.js-ptitle').val();
+
+let data = JSON.stringify({
+
+
+
+    title: title,
+    description: description,
+    value: value,
+    projecttitle: projecttitle
+   
+});
+
+$.ajax({
+    url: '/Reward/CreateReward',
+    type: 'POST',
+    contentType: 'application/json',
+    data: data
+}).done((reward) => {
+    $('.alert').hide();
+
+    let $alertArea = $('.js-create-reward-success');
+    $alertArea.html(`Successfully added reward with name ${reward.title}`);
+    $alertArea.show();
+
+
+    $('form.js-create-reward').hide();
+}).fail((xhr) => {
+    $('.alert').hide();
+
+    let $alertArea = $('.js-create-reward-alert');
+    $alertArea.html(xhr.responseText);
+    $alertArea.fadeIn();
+
+    setTimeout(function () {
+        $('.js-submit-reward').attr('disabled', false);
+    }, 300);
+});
+}); 
+
+
+///-------------Search----------
+$('.js-btn-search').on('click', () => {
+    let title = $('.js-project-title').val();
+    $.ajax({
+        url: '/Home/SearchProjects',
+        type: 'GET',
+        data: {
+            title: title
+        }
+    }).done((projects) => {
+        let $projectsList = $('.js-project-list');
+        $projectsList.html('');
+        $('.card').hide();
+        projects.forEach(element => {
+            let listItem =
+                //`<tr>
+                //    <td>${element.Title}</td>
+                //    <td>${element.Description}</td>
+                //</tr>`;
+                //`
+                `
+        <img src="#" class="card-img-top" alt="No photo available">
+        <div class="card-body js-project-list">
+                <h5 class="card-title">${element.Title}</h5>
+                <p class="card-text">${element.Description}</p>
+                <a href="#" align="center" class="btn btn-primary">Details</a>
+    </div>
+                        `;
+
+            $projectsList.append(listItem);
+            $cards = $('.card-results');
+            $cards.show();
+        });
+    }).fail((xhr) => {
+        alert(xhr.responseText);
+    });
+});
+

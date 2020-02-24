@@ -1,0 +1,13 @@
+﻿@model Crowdfund.Web.Models.ProjectsViewModel
+
+
+
+<ul>
+    @{
+        foreach (var project in Model.OwnerProjects) {
+            <li>
+                @project.Title
+            </li>
+        }
+    }
+</ul>

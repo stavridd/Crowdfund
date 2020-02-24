@@ -21,15 +21,23 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Watch Remove="Views\Buyer\BrowseFundedProjects.cshtml" />
 	  <Watch Remove="Views\Owner\Create.cshtml" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Include="Views\Buyer\BuyProject.cshtml" />
 	  <None Include="Views\Buyer\Create.cshtml" />
 	  <None Include="Views\Buyer\Index.cshtml" />
+	  <None Include="Views\Home\Backer.cshtml" />
+	  <None Include="Views\Home\Creator.cshtml" />
 	  <None Include="Views\Owner\Create.cshtml" />
 	  <None Include="Views\Owner\Index.cshtml" />
+	  <None Include="Views\Owner\BrowseFundedProjects.cshtml" />
+	  <None Include="Views\Project\Buy.cshtml" />
 	  <None Include="Views\Project\Create.cshtml" />
+	  <None Include="Views\Project\Detail.cshtml" />
 	  <None Include="Views\Project\Index.cshtml" />
+	  <None Include="Views\Reward\Create.cshtml" />
 	</ItemGroup>
 </Project>

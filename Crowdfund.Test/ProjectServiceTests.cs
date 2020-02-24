@@ -120,7 +120,7 @@ namespace Crowdfund.Test {
         [Fact]
         public async Task BuyProject_Success()
         {
-            var success = await psvc_.BuyProjectAsync(5, 8, 3);
+            var success = await psvc_.BuyProjectAsync(1, 1, 1);
             Assert.True(success);
         }
 
@@ -134,6 +134,21 @@ namespace Crowdfund.Test {
             Assert.True(isPosted);
 
             var stats = await psvc_.GetStatusUpdateAsync(3);
+
+            //Assert.Equal(isPosted, stats.Data);
+
+        }
+
+        [Fact]
+        public async Task AddMulti_Success() {
+            var url = "https://www.google.com/url?sa=i&url=https%3A%2F%2Funsplash.com%2Fs%2Fphotos%2Fphotos&psig=AOvVaw3qW_LFhZC3J3q3hDosZFTr&ust=1582463875266000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCLD1m7uf5ecCFQAAAAAdAAAAABAD";
+
+
+            var multi = await psvc_.AddMultiAsync(2, url, Crowdfund.Core.Model.MultimediaCategory.Photo);
+
+            //Assert.True(isPosted);
+
+            // var stats = await psvc_.GetStatusUpdateAsync(3);
 
             //Assert.Equal(isPosted, stats.Data);
 

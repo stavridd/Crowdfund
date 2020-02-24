@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Crowdfund.Core.Data;
+using Crowdfund.Core.Model;
 using Crowdfund.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +12,13 @@ namespace Crowdfund.Web.Controllers {
 
 
         private Core.Services.IBuyerService buyers_;
-        public BuyerController(
-          Core.Services.IBuyerService buyers) {
+        private Core.Services.IProjectService projects_;
+        private readonly CrowdfundDbContext context_;
+        public BuyerController(Core.Services.IProjectService projects,
+          Core.Services.IBuyerService buyers, CrowdfundDbContext context) {
             buyers_ = buyers;
+            projects_ = projects;
+            context_ = context;
         }
 
         public IActionResult Index() {
@@ -48,6 +54,41 @@ namespace Crowdfund.Web.Controllers {
             var result = await buyers_.CreateBuyerAsync(options);
             return result.AsStatusResult();
         }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> BrowseFundedProjects() {
+
+            var projectList = context_
+                .Set<ProjectBuyer>()
+                .Where(p => p.BuyerId == 1)
+                .Take(100)              
+                .ToList();
+
+            var list = new List<Project>();
+
+            foreach (var p in projectList) {
+
+                var pj = await projects_.SearchProjectByIdAsync(p.ProjectId);
+
+                list.Add(pj.Data);
+            }
+
+            var projects = new Models.ProjectsViewModel() {
+                BuyerProjects = list
+            };
+            return View(projects);
+        }
+
+
+
+
+
+
+
+
+
 
     }
 }

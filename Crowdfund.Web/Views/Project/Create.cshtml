@@ -1,4 +1,4 @@
-﻿@model Crowdfund.Core.Model.Options.CreateProjectOptions
+﻿@model Crowdfund.Web.Models.CreateProjectViewModel
 
 <form class="js-create-project" method="post"
       action="@Url.Action("CreateProject", "Project")">
@@ -6,44 +6,87 @@
     <div class="form-row">
 
         <div class="form-group col-md-4">
-            <label for="@Html.IdFor(p => p.Title)">Project Title</label>
-            @Html.TextBoxFor(p => p.Title,
+            <label for="@Html.IdFor(p => p.CreateOptions.Title)">Project Title</label>
+            @Html.TextBoxFor(p => p.CreateOptions.Title,
                 new { @class = "form-control js-title", placeholder = "enter project title" })
         </div>
 
-        @*<div class="form-group col-md-4">
-                <label for="@Html.IdFor(p => p.OwnerId)"> Your Id</label>
-                @Html.TextBoxFor(p => p.OwnerId,
-                    new { @class = "form-control js-id", placeholder = "enter id" })
-            </div>*@
+
 
     </div>
 
     <div class="form-row">
         <div class="form-group col-md-4">
-            <label for="@Html.IdFor(p => p.Description)">Description</label>
-            @Html.TextBoxFor(p => p.Description,
+            <label for="@Html.IdFor(p => p.CreateOptions.Description)">Description</label>
+            @Html.TextAreaFor(p => p.CreateOptions.Description,
                 new { @class = "form-control js-description", placeholder = "enter project description" })
         </div>
 
 
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="@Html.IdFor(p => p.projectcategory)"> Category</label>
-                @Html.TextBoxFor(p => p.projectcategory,
-                    new { @class = "form-control js-category ", placeholder = "Select Category" })
-            </div>
+    </div>
 
+    <div class="form-row">
+        <div class="form-group">
+            <label for="@Html.IdFor(p => p.CreateOptions.projectcategory)"> Product Category </label>
+            @Html.DropDownListFor(p => p.CreateOptions.projectcategory,
+            Html.GetEnumSelectList(typeof(Crowdfund.Core.Model.ProjectCategory)),
+            "Select Category", new { @class = "form-control js-category" })
+        </div>
+    </div>
+
+
+
+    <div class="form-row ">
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(p => p.CreateOptions.Goal)"> Project goal</label>
+            @Html.TextBoxFor(p => p.CreateOptions.Goal,
+                new { @class = "form-control js-goal", placeholder = "enter goal" })
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(p => p.reward)"> Reward Title</label>
+            @Html.TextBoxFor(p => p.reward,
+                new { @class = "form-control js-reward-title", placeholder = "enter reward title" })
         </div>
 
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(p => p.reward)"> Reward Description</label>
+            @Html.TextBoxFor(p => p.reward,
+                new { @class = "form-control js-reward-descrirpion", placeholder = "enter reward description" })
+        </div>
+
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(p => p.reward)"> Reward value</label>
+            @Html.TextBoxFor(p => p.reward,
+                new { @class = "form-control js-reward-value", placeholder = "enter reward value" })
+        </div>
+
+        <button type="button" class="btn btn-primary btn-sm submit-reward">Add reward</button>
     </div>
-    <button type="button" class="btn btn-primary js-submit-project">Submit</button>
+
+
+    <div class="form-group col-md-4">
+        <label for="@Html.IdFor(p => p.CreateOptions.Multis)"> Photo Url</label>
+        @Html.TextBoxFor(p => p.CreateOptions.Multis,
+            new { @class = "form-control js-photo", placeholder = "enter  photo" })
+    </div>
+
+
+
+    <div class="form-row ">
+        <div class="form-group col-md-4">
+            <button type="button" class="btn btn-primary js-submit-project">Submit</button>
+        </div>
+    </div>
+
 </form>
 
 <div class="alert alert-danger js-create-project-alert" role="alert"
-         style="display: none">
-    </div>
+     style="display: none">
+</div>
 
-    <div class="alert alert-success js-create-project-success" role="alert"
-         style="display: none">
-    </div>
+<div class="alert alert-success js-create-project-success" role="alert"
+     style="display: none">
+</div>

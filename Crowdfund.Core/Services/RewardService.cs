@@ -81,8 +81,27 @@ namespace Crowdfund.Core.Services {
              return ApiResult<Reward>.CreateSuccess(reward); 
         }
 
-        public async Task<ApiResult<Reward>> SearchRewardByIdAsync(int rewardId)
+        public async Task<ApiResult<List<Reward>>> SearchRewardByProjectIdAsync(int projectId)
         {
+            if (projectId <= 0) {
+                return new ApiResult<List<Reward>>(
+                       StatusCode.BadRequest, "Reward Invalid");
+            }
+            var rewardList = await context_
+                .Set<Reward>()
+                .Where(s => s.ProjectId == projectId)
+                .ToListAsync();
+
+            if (rewardList == null) {
+
+                return new ApiResult<List<Reward>>(
+                      StatusCode.BadRequest, "Reward Was Not Found");
+            }
+
+            return ApiResult<List<Reward>>.CreateSuccess(rewardList);
+        }
+
+        public async Task<ApiResult<Reward>> SearchRewardByIdAsync(int rewardId) {
             if (rewardId <= 0) {
                 return new ApiResult<Reward>(
                        StatusCode.BadRequest, "Reward Invalid");
@@ -91,13 +110,10 @@ namespace Crowdfund.Core.Services {
                 .Set<Reward>()
                 .Where(s => s.Id == rewardId)
                 .SingleOrDefaultAsync();
-
             if (reward == null) {
-
                 return new ApiResult<Reward>(
                       StatusCode.BadRequest, "Reward Was Not Found");
             }
-
             return ApiResult<Reward>.CreateSuccess(reward);
         }
     }

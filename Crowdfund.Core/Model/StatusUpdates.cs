@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace Crowdfund.Core.Model {
     public class StatusUpdates        
@@ -11,6 +12,11 @@ namespace Crowdfund.Core.Model {
 
         public DateTimeOffset DatePost { get; set; }
 
+        [JsonIgnore]
         public Project project { get; set; }
+
+        public StatusUpdates() {
+            DatePost = DateTimeOffset.Now;
+        }
     }
 }

@@ -9,9 +9,13 @@ namespace Crowdfund.Web.Models {
 
         public Core.Model.Options.CreateProjectOptions CreateOptions { get; set; }
 
+        
+
         public int OwnerId { get; set; }
         public string ErrorText { get; set; }
 
+        public int projId { get; set; }
 
+        public List<Reward> reward { get; set; }
     }
 }

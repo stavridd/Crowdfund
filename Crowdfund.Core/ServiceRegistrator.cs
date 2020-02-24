@@ -1,6 +1,5 @@
 ﻿using System;
 using Autofac;
-using System;
 using Crowdfund.Core.Services;
 
 namespace Crowdfund.Core {

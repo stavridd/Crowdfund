@@ -7,16 +7,18 @@ using Crowdfund.Web.Extensions;
 using Crowdfund.Core.Data;
 
 using Microsoft.EntityFrameworkCore;
-
+using Crowdfund.Core.Model;
 
 namespace Crowdfund.Web.Controllers {
     public class OwnerController : Controller {
         private Core.Services.IOwnerService owners_;
+        private readonly CrowdfundDbContext context_;
 
-        public OwnerController(
+        public OwnerController(CrowdfundDbContext context,
           Core.Services.IOwnerService owners)
         {
             owners_ = owners;
+            context_ = context;
         }
         public IActionResult Index()
         {
@@ -53,6 +55,26 @@ namespace Crowdfund.Web.Controllers {
 
             return result.AsStatusResult();
         }
+
+
+        [HttpGet]
+        public IActionResult BrowseFundedProjects() {
+            var projectList = context_
+                .Set<Project>()
+                .Where(p => p.OwnerId == 1)
+                .Take(100)
+                .OrderByDescending(a => a.Contributions)
+                .ToList();
+
+            var projects = new Models.ProjectsViewModel() {
+                OwnerProjects = projectList
+            };
+            return View(projects);
+        }
+
+
+
+
     }
 }
 
