@@ -1,0 +1,29 @@
+﻿@using Crowdfund.Core.Model
+@model List<Crowdfund.Core.Model.Project>
+
+<div class="container">
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Title</th>
+                    <th>Goal</th>
+
+                </tr>
+            </thead>
+
+            <tbody class="js-project-list">
+                @{
+                    foreach (var project in Model) {
+                        <tr>
+                            <td>@project.projectcategory</td>
+                            <td>@project.Title</td>
+                            <td>@project.Goal</td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+        </table>
+    </div>

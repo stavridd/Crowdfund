@@ -1,19 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Crowdfund.Web.Models;
 using Autofac;
+using System.Linq;
+using System.Diagnostics;
 using Crowdfund.Core.Data;
 using Crowdfund.Core.Model;
+using Crowdfund.Web.Models;
+using System.Threading.Tasks;
 using Crowdfund.Core.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
-namespace Crowdfund.Web.Controllers {
-    public class HomeController : Controller {
+namespace Crowdfund.Web.Controllers
+{
+    public class HomeController : Controller
+    {
         private readonly ILogger<HomeController> _logger;
         private readonly CrowdfundDbContext context_;
         private readonly IProjectService projects_;
@@ -31,10 +33,10 @@ namespace Crowdfund.Web.Controllers {
         {
             var projectList = context_
                 .Set<Project>()
+                .Include(p => p.Multis)
                 .Take(100)
                 .OrderByDescending(a => a.Contributions)
                 .ToList();
-
             var projects = new Models.ProjectsViewModel()
             {
                 Projects = projectList
@@ -43,18 +45,35 @@ namespace Crowdfund.Web.Controllers {
         }
 
         public async Task<IActionResult> SearchProjects(
-    string title) {
-            if (string.IsNullOrWhiteSpace(title)) {
+                string title)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+            {
                 return BadRequest("Title is required");
             }
             var projectList = await projects_.SearchProject(
-                new Core.Model.Options.SearchProjectOptions() {
+                new Core.Model.Options.SearchProjectOptions()
+                {
                     Title = title
                 })
-                .Select(c => new { c.Title })
+                 .Select(c => new { c.projectcategory, c.Title, c.Goal, c.Contributions, c.Description })
                 .Take(100)
                 .ToListAsync();
             return Json(projectList);
+        }
+
+        [HttpGet("Home/{category}")]
+        public async Task<IActionResult> SearchProjectsCategory(
+                        Crowdfund.Core.Model.ProjectCategory category)
+        {
+            if (category == Crowdfund.Core.Model.ProjectCategory.invalid)
+            {
+                return BadRequest("Project Category is required");
+            }
+            var projectList = await projects_.SearchProjectByCstegory(category)
+                .Take(100)
+                .ToListAsync();
+            return View("SearchCategory", projectList);
         }
 
         public IActionResult Privacy()
@@ -62,11 +81,13 @@ namespace Crowdfund.Web.Controllers {
             return View();
         }
 
-        public IActionResult Creator() {
+        public IActionResult Creator()
+        {
             return View();
         }
 
-        public IActionResult Backer() {
+        public IActionResult Backer()
+        {
             return View();
         }
 

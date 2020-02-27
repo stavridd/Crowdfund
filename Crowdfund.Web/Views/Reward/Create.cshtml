@@ -1,47 +1,55 @@
 ﻿@model Crowdfund.Core.Model.Options.CreateRewardOptions
 
+<form class="js-create-reward" method="post"
+      action="@Url.Action("CreateReward", "Reward")">
 
-    <form class="js-create-reward" method="post"
-          action="@Url.Action("CreateReward", "Reward")">
+    <div class="form-row">
 
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="@Html.IdFor(o => o.ProjectTitle)">Title</label>
-                @Html.TextBoxFor(o => o.ProjectTitle,
-                    new { @class = "form-control js-ptitle ", placeholder = "enter project title" })
-            </div>
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(o => o.ProjectTitle)">Title</label>
+            @Html.TextBoxFor(o => o.ProjectTitle,
+                new { @class = "form-control js-ptitle ", placeholder = "enter project title" })
+        </div>
+
+    </div>
+
+    <div class="form-row">
+
+        <div class="form-group col-md-4">
+            <label for="@Html.IdFor(o => o.Title)">Title</label>
+            @Html.TextBoxFor(o => o.Title,
+                new { @class = "form-control js-title ", placeholder = "enter title" })
+        </div>
+
+    </div>
+
+
+    <div class="form-row">
+
+        <div class="form-group col-md-4">
+
+            <label for="@Html.IdFor(o => o.Description)">Description</label>
+            @Html.TextBoxFor(o => o.Description,
+                new { @class = "form-control js-description", placeholder = "enter description" })
 
         </div>
 
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="@Html.IdFor(o => o.Title)">Title</label>
-                @Html.TextBoxFor(o => o.Title,
-                    new { @class = "form-control js-title ", placeholder = "enter title" })
-            </div>
+    </div>
+
+    <div class="form-row">
+
+        <div class="form-group col-md-2">
+
+            <label for="@Html.IdFor(o => o.Value)"> Total Cost</label>
+            @Html.TextBoxFor(o => o.Value,
+                new { @class = "form-control js-value ", placeholder = "enter price" })
 
         </div>
 
+    </div>
 
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="@Html.IdFor(o => o.Description)">Description</label>
-                @Html.TextBoxFor(o => o.Description,
-                    new { @class = "form-control js-description", placeholder = "enter description" })
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label for="@Html.IdFor(o => o.Value)"> Total Cost</label>
-                @Html.TextBoxFor(o => o.Value,
-                    new { @class = "form-control js-value ", placeholder = "enter price" })
-            </div>
-
-        </div>
-
-        <button type="button" class="btn btn-primary js-submit-reward">Submit</button>
-    </form>
+    <button type="button" class="btn btn-primary js-submit-reward">Submit</button>
+</form>
 
 <div class="alert alert-danger js-create-reward-alert" role="alert"
      style="display: none">

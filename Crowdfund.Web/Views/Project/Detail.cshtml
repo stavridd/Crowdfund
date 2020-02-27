@@ -2,37 +2,34 @@
 
 <h2>@Model.Title</h2>
 
-<h5>@Model.projectcategory </h5>
-
-
-
-
-<div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img class="d-block w-100" src="@Model.Multis" alt="First slide">
-        </div>
-    </div>
-</div>
-
 <div class="progress">
-    <div class="progress-bar" role="progressbar" aria-valuenow="@Model.progress"
-         aria-valuemin="0" aria-valuemax="100"></div>
-</div>
 
+    <div class="progress-bar" role="progressbar" style="width: @((int)Model.Progress)%;" aria-valuenow="@((int)Model.Progress)" aria-valuemin="0" aria-valuemax="100">
+        @((int)Model.Progress)%
+    </div>
+
+</div>
 
 <p class="lead">
     @Model.Description
 </p>
 
 @{
-
-
-    @foreach (var reward in Model.Rewards.Data) {
+    @foreach (var reward in Model.Rewards.Data)
+    {
         <div class="card">
             <div class="card-body">
-                @reward.Title;
+                <p class="reward-title"> @reward.Title</p>
+                <p class="reward-desc"> @reward.Description </p>
+                <p class="reward-desc"> @reward.Value </p>
+                <p class="js-reward-id" id=" reward" style="display :none"> @reward.Id </p>
+                <p class="js-project-id" style="display :none"> @Model.Id </p>
+                <button type="button" class="btn btn-success js-btn-buy" style="width: 8rem;">Get This!</button>
             </div>
         </div>
     }
 }
+
+<div class="alert alert-success js-buy-reward-success" role="alert" style="display: none">
+    You Get IT!!!
+</div>

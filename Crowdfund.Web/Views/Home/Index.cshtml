@@ -1,72 +1,101 @@
 ﻿@model Crowdfund.Web.Models.ProjectsViewModel
+
 @{
     ViewData["Title"] = "Home Page";
 }
-<div class="text-center">
-    <h1 class="display-4">Welcome!!</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">Categories:</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent" pa>
+
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active ">
-                <a class="nav-link js-art" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.Arts })">
+                <a class="nav-link js-cat" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.Arts })">
                     @Crowdfund.Core.Model.ProjectCategory.Arts<span class="sr-only  js-art">(current)</span>
                 </a>
             </li>
+
             <li class="nav-item active">
-                <a class="nav-link" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.ComicsAndIllustration })">
+                <a class="nav-link js-cat" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.ComicsAndIllustration })">
                     @Crowdfund.Core.Model.ProjectCategory.ComicsAndIllustration <span class="sr-only">(current)</span>
                 </a>
             </li>
+
             <li class="nav-item active">
-                <a class="nav-link" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.DesignAndTech })">
+                <a class="nav-link js-cat" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.DesignAndTech })">
                     @Crowdfund.Core.Model.ProjectCategory.DesignAndTech <span class="sr-only">(current)</span>
                 </a>
             </li>
+
             <li class="nav-item active">
-                <a class="nav-link" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.Film })">
+                <a class="nav-link js-cat" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.Film })">
                     @Crowdfund.Core.Model.ProjectCategory.Film <span class="sr-only">(current)</span>
                 </a>
             </li>
+
             <li class="nav-item active">
-                <a class="nav-link" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.FoodAndCraft })">
+                <a class="nav-link js-cat" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.FoodAndCraft })">
                     @Crowdfund.Core.Model.ProjectCategory.FoodAndCraft <span class="sr-only">(current)</span>
                 </a>
             </li>
+
             <li class="nav-item active">
-                <a class="nav-link" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.Games })">
+                <a class="nav-link js-cat" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.Games })">
                     @Crowdfund.Core.Model.ProjectCategory.Games <span class="sr-only">(current)</span>
                 </a>
             </li>
+
             <li class="nav-item active">
-                <a class="nav-link" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.Music })">
+                <a class="nav-link js-cat" href="@Url.Action( "SearchProjectsCategory","Home", new { category =Crowdfund.Core.Model.ProjectCategory.Music })">
                     @Crowdfund.Core.Model.ProjectCategory.Music <span class="sr-only">(current)</span>
                 </a>
             </li>
+
         </ul>
+
         <form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2 js-project-title" type="search" placeholder="Search Project" aria-label="Search">
             <button class="btn btn-outline-success my-2 my-sm-0 js-btn-search" type="button">Search</button>
         </form>
+
     </div>
 </nav>
-@{
-    @foreach (var project in Model.Projects) {
-        <div align="center" class="card" style="width: 25rem; ">
-            <img src="@project.Multis" class="card-img-top" alt="No photo available">
-            <div class="card-body">
-                <h5 class="card-title">@project.Title</h5>
-                <p class="card-text">@project.Description</p>
-                <a href="@Url.Action("detail", "project", new { id = project.Id })"  align="center" class="btn btn-primary details" value=" @project.Id">Details</a>
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Crowdfund!!</h1>
+</div>
+
+<div class="row">
+    @foreach (var project in Model.Projects)
+    {
+        <div class="col">
+            <div align="center" class="card" style="width: 25rem; margin-top: 30px;">
+
+                @if (project.Multis?.Count != 0)
+                {
+                    <img src="@project.Multis.First()?.Url" class="card-img-top" alt="No photo available" style="max-width: 200px">
+                }
+
+                <div class="card-body">
+                    <h5 class="card-title">@project.Title</h5>
+                    <p class="card-text">@project.Description</p>
+                    <p class="card-goal">Goal: @project.Goal</p>
+                    <a href="@Url.Action("detail", "project", new { id = project.Id })" align="center" class="btn btn-primary details" value=" @project.Id">Details</a>
+                </div>
+
             </div>
         </div>
     }
-}
+</div>
+
+
+<div align="center" class="cards" style="width: 25rem; display: none">
+</div>
+
 <div class="row js-view-projects">
 </div>
 <div align="center" class="card card-results" style="width: 18rem; display: none">
