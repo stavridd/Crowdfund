@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Crowdfund.Core.Model {
     public class Project {
+
         /// <summary>
         /// The id of the project
         /// </summary>
@@ -35,6 +36,9 @@ namespace Crowdfund.Core.Model {
         /// </summary>
         public ProjectCategory projectcategory { get; set; }
 
+        /// <summary>
+        /// The status of the project
+        /// </summary>
         public ProjectStatus Status { get; set; } 
 
         /// <summary>
@@ -54,12 +58,25 @@ namespace Crowdfund.Core.Model {
         [JsonIgnore]
         public Owner Owner { get; set; }
 
+        /// <summary>
+        /// The id of the owner
+        /// </summary>
         public int OwnerId { get; set; }
 
+        /// <summary>
+        /// The financial goal of the project
+        /// </summary>
         public decimal Goal { get; set; }
 
+        /// <summary>
+        /// The number of the backers who 
+        /// buy a reward
+        /// </summary>
         public int NumberOfContributions { get; set; }
 
+        /// <summary>
+        /// The amount of contributions
+        /// </summary>
         public decimal Contributions { get; set; }
 
         public Project()

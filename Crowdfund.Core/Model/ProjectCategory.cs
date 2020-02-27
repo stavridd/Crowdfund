@@ -1,5 +1,6 @@
 ﻿namespace Crowdfund.Core.Model {
     public enum ProjectCategory {
+
         /// <summary>
         /// Not a Category
         /// </summary>

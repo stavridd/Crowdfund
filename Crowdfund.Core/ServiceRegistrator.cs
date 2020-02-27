@@ -10,6 +10,7 @@ namespace Crowdfund.Core {
             if (builder == null) {
                 throw new ArgumentNullException(nameof(builder));
             }
+
             builder
                 .RegisterType<OwnerService>()
                 .InstancePerLifetimeScope()

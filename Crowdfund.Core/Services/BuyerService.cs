@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Crowdfund.Core.Model;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Crowdfund.Core.Model.Options;
 using Microsoft.EntityFrameworkCore;
-using Crowdfund.Core;
 
-namespace Crowdfund.Core.Services {
+namespace Crowdfund.Core.Services
+{
     public class BuyerService : IBuyerService 
     {
-        private readonly Data.CrowdfundDbContext context_;
-        private readonly IProjectService projects_;
+        
         private readonly ILoggerService logger_;
+        private readonly IProjectService projects_;
+        private readonly Data.CrowdfundDbContext context_;
 
         public BuyerService(Data.CrowdfundDbContext context,
             IProjectService projects, ILoggerService logger)
         {
-            context_ = context ??
-                throw new ArgumentException(nameof(context));
-            projects_ = projects;
-            logger_ = logger;
+            context_ = context ?? throw new ArgumentException(nameof(context));
+            projects_ = projects ?? throw new ArgumentException(nameof(projects));
+            logger_ = logger ?? throw new ArgumentException(nameof(logger));
         }
 
         public async Task<ApiResult<Buyer>> CreateBuyerAsync(
@@ -76,8 +76,6 @@ namespace Crowdfund.Core.Services {
 
             }
 
-            
-
             return ApiResult<Buyer>.CreateSuccess(buyer);
         }
 
@@ -129,7 +127,8 @@ namespace Crowdfund.Core.Services {
             return ApiResult<Buyer>.CreateSuccess(buyer);
         }
 
-        public async Task<ApiResult<Buyer>> UpdateBuyerAsync(int id, UpdateBuyerOptions options)
+        public async Task<ApiResult<Buyer>> UpdateBuyerAsync(int id, 
+                        UpdateBuyerOptions options)
         {
             if (id <= 0) {
                 return new ApiResult<Buyer>(
@@ -173,6 +172,7 @@ namespace Crowdfund.Core.Services {
                        "Error Update Backer");
 
             }
+
             return ApiResult<Buyer>.CreateSuccess(buyer.Data);
         }
 
@@ -201,11 +201,13 @@ namespace Crowdfund.Core.Services {
                 return new ApiResult<ICollection<Project>>(
                     StatusCode.BadRequest, "No projects are available");
             }
+
             return ApiResult<ICollection<Project>>.CreateSuccess(projectList);
         }
 
 
-        public async Task<ApiResult<ICollection<Project>>> GetMyCompletedProjectsAsync(int buyerId)
+        public async Task<ApiResult<ICollection<Project>>> GetMyCompletedProjectsAsync(
+                    int buyerId)
         {
             var buyer = await SearchBuyerByIdAsync(buyerId);
 

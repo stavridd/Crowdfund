@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Crowdfund.Core.Model;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Core.Services {
@@ -18,11 +18,10 @@ namespace Crowdfund.Core.Services {
                   IRewardService reward, IOwnerService owner,
                   ILoggerService logger)
         {
-            context_ = context ??
-                throw new ArgumentException(nameof(context));
-            rewards_ = reward;
-            owners_ = owner;
-            logger_ = logger;
+            context_ = context ?? throw new ArgumentException(nameof(context));
+            rewards_ = reward ?? throw new ArgumentException(nameof(reward));
+            owners_ = owner ?? throw new ArgumentException(nameof(owner));
+            logger_ = logger ?? throw new ArgumentException(nameof(logger));
         }
 
         public async Task <ApiResult<Project>> CreateProjectAsync(int ownerId,
@@ -79,8 +78,6 @@ namespace Crowdfund.Core.Services {
                 Goal = options.Goal,
                 Owner = owner.Data
             };
-
-
 
            owner.Data.Projects.Add(project);
 
@@ -209,8 +206,6 @@ namespace Crowdfund.Core.Services {
                     BuyerId = buyerId
                 });
 
-            //Must change Below
-
             var reward = await rewards_.SearchRewardByIdAsync(rewardId);
 
             if (reward == null) {
@@ -242,7 +237,6 @@ namespace Crowdfund.Core.Services {
             }
 
             return true;
-
         }
 
         public async Task<int> GetProjectIdAsync(string title, string Desc)
@@ -292,8 +286,8 @@ namespace Crowdfund.Core.Services {
 
             var statusUpdate = new StatusUpdates()
             {
-                id = projectId,
-                statusUpdate = update,
+                Id = projectId,
+                StatusUpdate = update,
                 DatePost = DateTimeOffset.Now
             };
 
@@ -331,7 +325,7 @@ namespace Crowdfund.Core.Services {
                 .AsQueryable();
 
             var statusUp = await query
-                .Where(u => u.id == projectId)
+                .Where(u => u.Id == projectId)
                 .ToListAsync();
 
             return ApiResult<List<StatusUpdates>>.CreateSuccess(statusUp);
@@ -356,7 +350,7 @@ namespace Crowdfund.Core.Services {
                 .AsQueryable();
 
             var photo = await query
-                .Where(m => m.project == project.Data && m.multimediaCategory == MultimediaCategory.Photo)
+                .Where(m => m.Project == project.Data && m.MultimediaCategory == MultimediaCategory.Photo)
                 .ToListAsync();
 
             return ApiResult<List<Multimedia>>.CreateSuccess(photo);
@@ -380,8 +374,8 @@ namespace Crowdfund.Core.Services {
                 .AsQueryable();
 
             var statusUp = await query
-                .Where(m => m.project == project.Data &&
-                m.multimediaCategory == MultimediaCategory.Video)
+                .Where(m => m.Project == project.Data &&
+                m.MultimediaCategory == MultimediaCategory.Video)
                 .ToListAsync();
 
             return ApiResult<List<Multimedia>>.CreateSuccess(statusUp);
@@ -413,10 +407,10 @@ namespace Crowdfund.Core.Services {
 
 
             var multi = new Multimedia() {
-                projectId = project.Data.Id,
-                url = url,
-                multimediaCategory = category,
-                project = project.Data
+                ProjectId = project.Data.Id,
+                Url = url,
+                MultimediaCategory = category,
+                Project = project.Data
             };
 
 

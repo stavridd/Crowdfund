@@ -3,6 +3,7 @@ using Crowdfund.Core.Model;
 
 namespace Crowdfund.Core.Data {
     public class CrowdfundDbContext : DbContext {
+
         /// <summary>
         /// The string to connect with the 
         /// database
@@ -30,64 +31,23 @@ namespace Crowdfund.Core.Data {
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder
-               .Entity<Owner>()
-               .ToTable("Owner");
+            modelBuilder.Entity<Owner>().ToTable("Owner");
+            modelBuilder.Entity<Owner>().HasIndex(e => e.Email).IsUnique();
+            modelBuilder.Entity<Owner>().Property(a => a.Age).IsRequired();
 
-            modelBuilder
-               .Entity<Owner>()
-               .HasIndex(e => e.Email)
-               .IsUnique();
+            modelBuilder.Entity<Buyer>().ToTable("Buyer");
+            modelBuilder.Entity<Buyer>().HasIndex(e => e.Email).IsUnique();
+            modelBuilder.Entity<Buyer>().Property(a => a.Age).IsRequired();
 
-            modelBuilder
-              .Entity<Owner>()
-              .Property(a => a.Age)
-              .IsRequired();
+            modelBuilder.Entity<Reward>().ToTable("Reward");
+            modelBuilder.Entity<BuyerReward>().ToTable("BuyerReward");
+            modelBuilder.Entity<BuyerReward>().HasKey(op => new { op.BuyerId, op.RewardId });
 
-            modelBuilder
-               .Entity<Buyer>()
-               .ToTable("Buyer");
-
-
-            modelBuilder
-               .Entity<Buyer>()
-               .HasIndex(e => e.Email)
-               .IsUnique();
-
-            modelBuilder
-              .Entity<Buyer>()
-              .Property(a => a.Age)
-              .IsRequired();
-
-            modelBuilder
-               .Entity<Reward>()
-               .ToTable("Reward");
-
-            modelBuilder
-               .Entity<Project>()
-               .ToTable("Project");
-
-            modelBuilder
-               .Entity<ProjectBuyer>()
-               .ToTable("ProjectBuyer");
-
-            modelBuilder
-              .Entity<ProjectBuyer>()
-              .HasKey(op => new { op.BuyerId, op.ProjectId });
-
-            modelBuilder
-               .Entity<BuyerReward>()
-               .ToTable("BuyerReward");
-
-            modelBuilder
-              .Entity<BuyerReward>()
-              .HasKey(op => new { op.BuyerId, op.RewardId });
-
-            modelBuilder
-              .Entity<StatusUpdates>()
-              .ToTable("StatusUpdates");
-
-
+            modelBuilder.Entity<Project>().ToTable("Project");
+            modelBuilder.Entity<ProjectBuyer>().ToTable("ProjectBuyer");
+            modelBuilder.Entity<ProjectBuyer>().HasKey(op => new { op.BuyerId, op.ProjectId });
+       
+            modelBuilder.Entity<StatusUpdates>().ToTable("StatusUpdates");
         }
 
         /// <summary>

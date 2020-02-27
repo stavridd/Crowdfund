@@ -1,6 +1,7 @@
 ﻿namespace Crowdfund.Core.Model.Options {
     public class UpdateOwnerOptions 
     {
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

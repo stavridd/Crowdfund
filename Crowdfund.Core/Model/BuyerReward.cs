@@ -6,6 +6,10 @@
         /// </summary>
         public int BuyerId { get; set; }
 
+
+        /// <summary>
+        /// Navigation property for Entity Framework
+        /// </summary>
         public Buyer Buyer { get; set; }
 
         /// <summary>
@@ -13,6 +17,10 @@
         /// </summary>
         public int RewardId { get; set; }
 
+
+        /// <summary>
+        /// Navigation property for Entity Frameworl
+        /// </summary>
         public Reward Reward { get; set; }
     }
 }

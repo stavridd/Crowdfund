@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Crowdfund.Core.Model;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Crowdfund.Core.Services {
     public interface IOwnerService 
     {
+
         Task<ApiResult<Owner>> CreateOwnerAsync(
             Model.Options.CreateOwnerOptions options);
 

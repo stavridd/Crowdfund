@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using System.Collections.Generic;
+
 
 namespace Crowdfund.Core.Model {
     public class Owner {
+
         /// <summary>
         /// The id of the Project Creator
         /// </summary>
@@ -27,7 +29,6 @@ namespace Crowdfund.Core.Model {
         /// The age of the Project Creator
         /// </summary>
         public int Age { get; set; }
-
 
         /// <summary>
         /// The Photo of the Project Creator

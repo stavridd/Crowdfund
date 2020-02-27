@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Crowdfund.Core.Model;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Crowdfund.Core.Model.Options;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,16 +11,14 @@ namespace Crowdfund.Core.Services {
     public class OwnerService : IOwnerService 
     {
         private readonly Data.CrowdfundDbContext context_;
-        //private readonly IProjectService projects_;
         private readonly ILoggerService logger_;
 
         public OwnerService(Data.CrowdfundDbContext context,
             ILoggerService logger)
 
         {
-            context_ = context ??
-                throw new ArgumentException(nameof(context));
-            logger_ = logger;
+            context_ = context ?? throw new ArgumentException(nameof(context));
+            logger_ = logger ?? throw new ArgumentException(nameof(logger));
         }
 
         public async Task<ApiResult<Owner>> CreateOwnerAsync(
@@ -157,7 +155,6 @@ namespace Crowdfund.Core.Services {
                 owner.Data.Age = options.Age;
             }
 
-            //context_.Update(owner);
             var success = false;
             try {
                 success = await context_.SaveChangesAsync() > 0;
@@ -189,7 +186,8 @@ namespace Crowdfund.Core.Services {
             var owner = await SearchOwnerByIdAsync(ownerId);
 
             if (owner == null) {
-                return new ApiResult<ICollection<Project>>(StatusCode.BadRequest, "Invalid Id");
+                return new ApiResult<ICollection<Project>>(StatusCode.BadRequest,
+                                "Invalid Id");
             }
             return ApiResult<ICollection<Project>>.CreateSuccess(owner.Data.Projects);
     
@@ -211,16 +209,7 @@ namespace Crowdfund.Core.Services {
             if (project.OwnerId == ownerId) {
                 return true;
             }
-           
-            //foreach(var p in owner.Data.Projects) {
-            //    if (p.Id != projectId) {
-            //        continue;
-            //    }
-            //    else {
-            //        return true;
-            //    }
-            //}
-
+        
             return false;
         }
     }

@@ -1,28 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Crowdfund.Core.Model;
-using Microsoft.EntityFrameworkCore;
 using Crowdfund.Core;
+using Crowdfund.Core.Model;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Crowdfund.Core.Services {
     public class RewardService : IRewardService 
     {
         private readonly Data.CrowdfundDbContext context_;
         private readonly IOwnerService owners_;
-        //private readonly IBuyerService buyers_;
         private readonly ILoggerService logger_;
 
         public RewardService(Data.CrowdfundDbContext context,
             IOwnerService owners, ILoggerService logger)
         {
-            context_ = context ??
-                throw new ArgumentException(nameof(context));
-            owners_ = owners;
-            logger_ = logger;
-            //buyers_ = buyer;
+            context_ = context ?? throw new ArgumentException(nameof(context));
+            owners_ = owners ?? throw new ArgumentException(nameof(owners));
+            logger_ = logger ?? throw new ArgumentException(nameof(logger));
         }
 
        public async Task<ApiResult<Reward>> CreateRewardAsync(int ownerId,
@@ -42,7 +40,6 @@ namespace Crowdfund.Core.Services {
                     StatusCode.BadRequest, "Null Title Or Description");
             }
 
-            //RE FUGE  RE MALAKA apo dw RE BRO
             var owner = await owners_.SearchOwnerByIdAsync(ownerId);
 
             if (owner == null) {

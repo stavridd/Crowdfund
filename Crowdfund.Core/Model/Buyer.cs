@@ -2,6 +2,7 @@
 
 namespace Crowdfund.Core.Model {
     public class Buyer {
+
         /// <summary>
         /// The id of the Backer
         /// </summary>

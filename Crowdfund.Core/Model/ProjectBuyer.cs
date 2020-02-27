@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Crowdfund.Core.Model {
     public class ProjectBuyer {
+
         /// <summary>
         /// The id of the backer of 
         /// the project
@@ -12,7 +13,7 @@ namespace Crowdfund.Core.Model {
         public int BuyerId { get; set; }
 
         /// <summary>
-        /// The Backer
+        /// The Backer (Navigation property)
         /// </summary>
         public Buyer Buyer { get; set; }
 
@@ -23,9 +24,8 @@ namespace Crowdfund.Core.Model {
         public int ProjectId { get; set; }
 
         /// <summary>
-        /// The project
+        /// The project (Navigation property)
         /// </summary>
-        /// 
         [JsonIgnore]
         public Project Project { get; set; }
     }

@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Crowdfund.Core.Model;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Crowdfund.Core.Services {
     public interface IProjectService 
@@ -20,8 +20,6 @@ namespace Crowdfund.Core.Services {
             ProjectStatus Status);
 
         Task<ApiResult<Project>> SearchProjectByIdAsync(int projectId);
-
-        // bool ProjectStatusUpdate(Project id);
 
         Task<bool> BuyProjectAsync(int projectId, int buyerId, int rewardId);
         

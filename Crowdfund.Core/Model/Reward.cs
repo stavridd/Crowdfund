@@ -2,6 +2,7 @@
 
 namespace Crowdfund.Core.Model {
     public class Reward {
+
         /// <summary>
         /// The id of the reward
         /// </summary>
@@ -23,7 +24,7 @@ namespace Crowdfund.Core.Model {
         public decimal Value { get; set; }
 
         /// <summary>
-        /// The project creator
+        /// The project creator (navigation property)
         /// </summary>
         public Owner Owner { get; set; }
 
@@ -32,7 +33,10 @@ namespace Crowdfund.Core.Model {
         /// </summary>
         public ICollection<BuyerReward> Buyers { get; set; }
 
-
+        /// <summary>
+        /// The id of the project that this
+        /// reward refers to
+        /// </summary>
         public int ProjectId { get; set; }
 
         public Reward()

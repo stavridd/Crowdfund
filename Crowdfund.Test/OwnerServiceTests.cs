@@ -1,17 +1,16 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
+﻿using Xunit;
+using System;
 using Autofac;
-
+using System.Linq;
+using System.Threading.Tasks;
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Test {
     public partial class OwnerServiceTests
                     : IClassFixture<CrowdfundFixture> {
+
         private readonly IOwnerService osvc_;
         private readonly IProjectService psvc_;
 

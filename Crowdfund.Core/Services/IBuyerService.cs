@@ -21,7 +21,8 @@ namespace Crowdfund.Core.Services {
         Task<ApiResult<ICollection<Project>>> GetMyProjectsAsync(
                     int buyerId);
 
-        Task<ApiResult<ICollection<Project>>> GetMyCompletedProjectsAsync(int buyerId);
+        Task<ApiResult<ICollection<Project>>> GetMyCompletedProjectsAsync(
+                    int buyerId);
 
         Task<bool> IsBuyerAllowedToSee(int buyerId, int projectId);
     }

@@ -5,6 +5,7 @@ using System.Text;
 namespace Crowdfund.Core.Model.Options {
     public class CreateRewardOptions 
     {
+
         public string Title { get; set; }
 
         public string ProjectTitle { get; set; }

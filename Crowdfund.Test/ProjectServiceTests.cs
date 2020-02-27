@@ -1,24 +1,22 @@
-﻿using System;
-using System.Linq;
-
-using Xunit;
+﻿using Xunit;
+using System;
 using Autofac;
-
+using System.Linq;
+using System.Threading.Tasks;
 using Crowdfund.Core.Services;
 using Crowdfund.Core.Model.Options;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace Crowdfund.Test {
     public partial class ProjectServiceTests : IClassFixture<CrowdfundFixture>
     {
+
         private readonly IProjectService psvc_;
 
         public ProjectServiceTests (CrowdfundFixture fixture)
         {
             psvc_ = fixture.Container.Resolve<IProjectService>();
         }
-
 
         [Fact]
         public async Task CreateProjectSuccess()
@@ -74,19 +72,17 @@ namespace Crowdfund.Test {
             var retreiveProject =await pr.ToListAsync();
 
             Assert.NotNull(retreiveProject);
-            //Assert.Contains($"This is a Test Project {rand}",
-            //         $"This is a Test Project {rand}");
+            Assert.Contains($"This is a Test Project {rand}",
+                     $"This is a Test Project {rand}");
         }
 
         [Fact]
         public void SearchProjectByIdSuccess()
-        {
-            
+        {      
             var pr =  psvc_.SearchProjectByCstegory( 
                  Core.Model.ProjectCategory.DesignAndTech);
 
-            Assert.NotNull(pr);
-            
+            Assert.NotNull(pr);  
         }
 
         [Fact]
@@ -134,24 +130,13 @@ namespace Crowdfund.Test {
             Assert.True(isPosted);
 
             var stats = await psvc_.GetStatusUpdateAsync(3);
-
-            //Assert.Equal(isPosted, stats.Data);
-
         }
 
         [Fact]
         public async Task AddMulti_Success() {
             var url = "https://www.google.com/url?sa=i&url=https%3A%2F%2Funsplash.com%2Fs%2Fphotos%2Fphotos&psig=AOvVaw3qW_LFhZC3J3q3hDosZFTr&ust=1582463875266000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCLD1m7uf5ecCFQAAAAAdAAAAABAD";
 
-
             var multi = await psvc_.AddMultiAsync(2, url, Crowdfund.Core.Model.MultimediaCategory.Photo);
-
-            //Assert.True(isPosted);
-
-            // var stats = await psvc_.GetStatusUpdateAsync(3);
-
-            //Assert.Equal(isPosted, stats.Data);
-
         }
     }
 }
