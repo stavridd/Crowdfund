@@ -1,15 +1,15 @@
 ﻿using System;
 using Autofac;
-
 using Crowdfund.Core.Services;
 
 namespace Crowdfund.Core {
-    public class ServiceRegistrator 
+    public class ServiceRegistrator : Module
     {
-        public static IContainer GetContainer()
+        public static void RegisterServices(ContainerBuilder builder)
         {
-            var builder = new ContainerBuilder();
-
+            if (builder == null) {
+                throw new ArgumentNullException(nameof(builder));
+            }
             builder
                 .RegisterType<OwnerService>()
                 .InstancePerLifetimeScope()
@@ -35,7 +35,28 @@ namespace Crowdfund.Core {
                 .InstancePerLifetimeScope()
                 .AsSelf();
 
+            builder
+                .RegisterType<LoggerService>()
+                .InstancePerLifetimeScope()
+                .As<ILoggerService>();
+        }
+
+        public static IContainer GetContainer()
+        {
+            var builder = new ContainerBuilder();
+
+            RegisterServices(builder);
+
             return builder.Build();
         }
+
+        protected override void Load(ContainerBuilder builder)
+        {
+            RegisterServices(builder);
+        }
+
+       
+
+        
     }
 }

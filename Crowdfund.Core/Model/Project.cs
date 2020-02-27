@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Crowdfund.Core.Model {
     public class Project {
@@ -20,12 +21,14 @@ namespace Crowdfund.Core.Model {
         /// <summary>
         /// A list of photos or videos url of the project 
         /// </summary>
+        [JsonIgnore]
         public ICollection<Multimedia> Multis { get; set; }
 
         /// <summary>
         /// A list of status updates of the project 
         /// </summary>
-        public List<StatusUpdates> Updates { get; set; }
+        [JsonIgnore]
+        public ICollection<StatusUpdates> Updates { get; set; }
 
         /// <summary>
         /// The category of the project 
@@ -42,11 +45,13 @@ namespace Crowdfund.Core.Model {
         /// <summary>
         /// A list of the contributors 
         /// </summary>
+        [JsonIgnore]
         public ICollection<ProjectBuyer> Buyers { get; set; }
 
         /// <summary>
         /// The project creator
         /// </summary>
+        [JsonIgnore]
         public Owner Owner { get; set; }
 
         public int OwnerId { get; set; }

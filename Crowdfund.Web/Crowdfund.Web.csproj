@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Crowdfund.Core\Crowdfund.Core.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- extends watching group to include *.js files -->
+		<Watch Include="**\*.js" Exclude="node_modules\**\*;**\*.js.map;obj\**\*;bin\**\*" />
+		<Watch Include="**\*.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Watch Remove="Views\Buyer\BrowseFundedProjects.cshtml" />
+	  <Watch Remove="Views\Owner\Create.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Views\Buyer\BuyProject.cshtml" />
+	  <None Include="Views\Buyer\Create.cshtml" />
+	  <None Include="Views\Buyer\Index.cshtml" />
+	  <None Include="Views\Home\Backer.cshtml" />
+	  <None Include="Views\Home\Creator.cshtml" />
+	  <None Include="Views\Owner\Create.cshtml" />
+	  <None Include="Views\Owner\Index.cshtml" />
+	  <None Include="Views\Owner\BrowseFundedProjects.cshtml" />
+	  <None Include="Views\Project\Buy.cshtml" />
+	  <None Include="Views\Project\Create.cshtml" />
+	  <None Include="Views\Project\Detail.cshtml" />
+	  <None Include="Views\Project\Index.cshtml" />
+	  <None Include="Views\Reward\Create.cshtml" />
+	</ItemGroup>
+</Project>

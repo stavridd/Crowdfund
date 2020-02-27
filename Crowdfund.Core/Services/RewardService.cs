@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 using Microsoft.EntityFrameworkCore;
+using Crowdfund.Core;
 
 namespace Crowdfund.Core.Services {
     public class RewardService : IRewardService 
@@ -12,13 +13,15 @@ namespace Crowdfund.Core.Services {
         private readonly Data.CrowdfundDbContext context_;
         private readonly IOwnerService owners_;
         //private readonly IBuyerService buyers_;
+        private readonly ILoggerService logger_;
 
         public RewardService(Data.CrowdfundDbContext context,
-            IOwnerService owners)
+            IOwnerService owners, ILoggerService logger)
         {
             context_ = context ??
                 throw new ArgumentException(nameof(context));
             owners_ = owners;
+            logger_ = logger;
             //buyers_ = buyer;
         }
 
@@ -66,16 +69,39 @@ namespace Crowdfund.Core.Services {
 
             try {
               await  context_.SaveChangesAsync();
-            } catch (Exception ex) {
-                return new ApiResult<Reward>(
-                      StatusCode.InternalServerError, "Reward Was Not Added");
+            } catch {
+                logger_.LogError(StatusCode.InternalServerError,
+                       $"Error Save Project: {reward.Title}");
+
+                return new ApiResult<Reward>
+                     (StatusCode.InternalServerError,
+                       "Error  Creating Reward");
             }
 
              return ApiResult<Reward>.CreateSuccess(reward); 
         }
 
-        public async Task<ApiResult<Reward>> SearchRewardByIdAsync(int rewardId)
+        public async Task<ApiResult<List<Reward>>> SearchRewardByProjectIdAsync(int projectId)
         {
+            if (projectId <= 0) {
+                return new ApiResult<List<Reward>>(
+                       StatusCode.BadRequest, "Reward Invalid");
+            }
+            var rewardList = await context_
+                .Set<Reward>()
+                .Where(s => s.ProjectId == projectId)
+                .ToListAsync();
+
+            if (rewardList == null) {
+
+                return new ApiResult<List<Reward>>(
+                      StatusCode.BadRequest, "Reward Was Not Found");
+            }
+
+            return ApiResult<List<Reward>>.CreateSuccess(rewardList);
+        }
+
+        public async Task<ApiResult<Reward>> SearchRewardByIdAsync(int rewardId) {
             if (rewardId <= 0) {
                 return new ApiResult<Reward>(
                        StatusCode.BadRequest, "Reward Invalid");
@@ -84,13 +110,10 @@ namespace Crowdfund.Core.Services {
                 .Set<Reward>()
                 .Where(s => s.Id == rewardId)
                 .SingleOrDefaultAsync();
-
             if (reward == null) {
-
                 return new ApiResult<Reward>(
                       StatusCode.BadRequest, "Reward Was Not Found");
             }
-
             return ApiResult<Reward>.CreateSuccess(reward);
         }
     }

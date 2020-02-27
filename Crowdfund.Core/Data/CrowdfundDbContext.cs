@@ -83,9 +83,11 @@ namespace Crowdfund.Core.Data {
               .Entity<BuyerReward>()
               .HasKey(op => new { op.BuyerId, op.RewardId });
 
+            modelBuilder
+              .Entity<StatusUpdates>()
+              .ToTable("StatusUpdates");
 
 
-            
         }
 
         /// <summary>

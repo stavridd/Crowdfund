@@ -5,19 +5,22 @@ using System.Threading.Tasks;
 using Crowdfund.Core.Model;
 using Crowdfund.Core.Model.Options;
 using Microsoft.EntityFrameworkCore;
+using Crowdfund.Core;
 
 namespace Crowdfund.Core.Services {
     public class BuyerService : IBuyerService 
     {
         private readonly Data.CrowdfundDbContext context_;
         private readonly IProjectService projects_;
+        private readonly ILoggerService logger_;
 
         public BuyerService(Data.CrowdfundDbContext context,
-            IProjectService projects)
+            IProjectService projects, ILoggerService logger)
         {
             context_ = context ??
                 throw new ArgumentException(nameof(context));
             projects_ = projects;
+            logger_ = logger;
         }
 
         public async Task<ApiResult<Buyer>> CreateBuyerAsync(
@@ -62,10 +65,18 @@ namespace Crowdfund.Core.Services {
             await context_.AddAsync(buyer);
             try {
                await context_.SaveChangesAsync();
-            } catch (Exception ex) {
-                
-                return null;
+            } catch {
+
+                logger_.LogError(StatusCode.InternalServerError,
+                    $"Error Save Backer: {buyer.LastName}");
+
+                return new ApiResult<Buyer>
+                     (StatusCode.InternalServerError,
+                       "Error Save Backer");
+
             }
+
+            
 
             return ApiResult<Buyer>.CreateSuccess(buyer);
         }
@@ -152,7 +163,14 @@ namespace Crowdfund.Core.Services {
             var success = false;
             try {
                 success = await context_.SaveChangesAsync() > 0;
-            } catch (Exception ex) {
+            } catch {
+
+                logger_.LogError(StatusCode.InternalServerError,
+                    $"Error Update Backer: {buyer.Data.LastName}");
+
+                return new ApiResult<Buyer>
+                     (StatusCode.InternalServerError,
+                       "Error Update Backer");
 
             }
             return ApiResult<Buyer>.CreateSuccess(buyer.Data);

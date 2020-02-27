@@ -1,0 +1,38 @@
+﻿@model Crowdfund.Web.Models.ProjectDetailView
+
+<h2>@Model.Title</h2>
+
+<h5>@Model.projectcategory </h5>
+
+
+
+
+<div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img class="d-block w-100" src="@Model.Multis" alt="First slide">
+        </div>
+    </div>
+</div>
+
+<div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="@Model.progress"
+         aria-valuemin="0" aria-valuemax="100"></div>
+</div>
+
+
+<p class="lead">
+    @Model.Description
+</p>
+
+@{
+
+
+    @foreach (var reward in Model.Rewards.Data) {
+        <div class="card">
+            <div class="card-body">
+                @reward.Title;
+            </div>
+        </div>
+    }
+}

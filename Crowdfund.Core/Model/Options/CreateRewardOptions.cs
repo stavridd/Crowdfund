@@ -7,6 +7,8 @@ namespace Crowdfund.Core.Model.Options {
     {
         public string Title { get; set; }
 
+        public string ProjectTitle { get; set; }
+
         public string Description { get; set; }
 
         public decimal Value { get; set; }

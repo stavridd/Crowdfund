@@ -12,12 +12,15 @@ namespace Crowdfund.Core.Services {
     {
         private readonly Data.CrowdfundDbContext context_;
         //private readonly IProjectService projects_;
+        private readonly ILoggerService logger_;
 
-        public OwnerService(Data.CrowdfundDbContext context)
-      //      IProjectService projects)
+        public OwnerService(Data.CrowdfundDbContext context,
+            ILoggerService logger)
+
         {
             context_ = context ??
                 throw new ArgumentException(nameof(context));
+            logger_ = logger;
         }
 
         public async Task<ApiResult<Owner>> CreateOwnerAsync(
@@ -62,9 +65,15 @@ namespace Crowdfund.Core.Services {
             await context_.AddAsync(owner);
             try {
                 await context_.SaveChangesAsync();
-            } catch (Exception ex) {
-                
-                return null;
+            } catch {
+
+                logger_.LogError(StatusCode.InternalServerError,
+                    $"Error Save Project Creator: {owner.LastName}");
+
+                return new ApiResult<Owner>
+                     (StatusCode.InternalServerError,
+                       "Error Save Project Creator");
+
             }
 
             return ApiResult<Owner>.CreateSuccess(owner);
@@ -152,10 +161,16 @@ namespace Crowdfund.Core.Services {
             var success = false;
             try {
                 success = await context_.SaveChangesAsync() > 0;
-            } catch (Exception ex) {
+            } catch {
 
+                logger_.LogError(StatusCode.InternalServerError,
+                    $"Error Update Project Creator: {owner.Data.LastName}");
+
+                return new ApiResult<Owner>
+                     (StatusCode.InternalServerError,
+                       "Error Update Project Creator");
             }
-            return ApiResult<Owner>.CreateSuccess(owner.Data);
+                return ApiResult<Owner>.CreateSuccess(owner.Data);
         }
 
         public async Task<bool> AddRewardAsync (int ownerId, Reward reward)

@@ -211,7 +211,10 @@ namespace Crowdfund.Core.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("ProjectId")
+                    b.Property<DateTimeOffset>("DatePost")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("projectId")
                         .HasColumnType("int");
 
                     b.Property<string>("statusUpdate")
@@ -219,7 +222,7 @@ namespace Crowdfund.Core.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("projectId");
 
                     b.ToTable("StatusUpdates");
                 });
@@ -279,9 +282,11 @@ namespace Crowdfund.Core.Migrations
 
             modelBuilder.Entity("Crowdfund.Core.Model.StatusUpdates", b =>
                 {
-                    b.HasOne("Crowdfund.Core.Model.Project", null)
+                    b.HasOne("Crowdfund.Core.Model.Project", "project")
                         .WithMany("Updates")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("projectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

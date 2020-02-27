@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Crowdfund.Core.Model {
     public class ProjectBuyer {
@@ -24,6 +25,8 @@ namespace Crowdfund.Core.Model {
         /// <summary>
         /// The project
         /// </summary>
+        /// 
+        [JsonIgnore]
         public Project Project { get; set; }
     }
 }
